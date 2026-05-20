@@ -1,0 +1,9 @@
+# Ignorar carpetas de compilación
+bin/
+obj/
+
+# Ignorar ejecutables
+*.exe
+*.o
+*.out
+*.idx
