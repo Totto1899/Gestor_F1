@@ -35,6 +35,6 @@ typedef struct{
 
 /// FUNCIONES
 
-void mostrar();
+void crearLote(const char* nomArc);
 
 #endif // LIBRARY_H_INCLUDED
