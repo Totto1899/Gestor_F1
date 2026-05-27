@@ -8,8 +8,8 @@
 //TDAs
 typedef struct{
     unsigned id;
-    char[30]nombre;
-    char[30]nacionalidad;
+    char nombre[30];
+    char nacionalidad[30];
     unsigned id_escuderia;
     unsigned puntos_acumulados;
     char estado;
@@ -18,19 +18,19 @@ typedef struct{
 
 typedef struct{
     unsigned id;
-    char[4]codigo;
-    char[30]nombre;
-    char[50]pais;
+    char codigo[4];
+    char nombre[30];
+    char pais[50];
     int estado;
 }tEscuderia;
 
 typedef struct{
     int id;
-    char[20]circuito;
+    char circuito[20];
     unsigned long long fecha;
     int estado;
     int cant_resultados;
-    int [][]mat_resultados;
+///    int mat_resultados[][];
 }tCarrera;
 
 #endif // LIBRARY_H_INCLUDED
