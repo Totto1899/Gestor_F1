@@ -33,4 +33,8 @@ typedef struct{
 ///    int mat_resultados[][];
 }tCarrera;
 
+/// FUNCIONES
+
+void mostrar();
+
 #endif // LIBRARY_H_INCLUDED
