@@ -1,0 +1,12 @@
+101|Max Verstappen|Neerlandesa|1|395|A|19970930
+102|Sergio Perez|Mexicana|1|258|A|19900126
+103|Charles Leclerc|Monegasca|2|280|A|19971016
+104|Carlos Sainz|Espanola|2|200|A|19940901
+105|Lewis Hamilton|Britanica|3|220|A|19850107
+106|George Russell|Britanica|3|160|A|19980215
+107|Lando Norris|Britanica|4|195|A|19991113
+108|Oscar Piastri|Australiana|4|150|A|20010406
+109|Fernando Alonso|Espanola|5|180|A|19810729
+110|Lance Stroll|Canadiense|5|60|A|19981029
+111|Kimi Raikkonen|Finlandesa|2|0|R|19791017
+112|Kevin Magnussen|Danesa|6|15|S|19921005

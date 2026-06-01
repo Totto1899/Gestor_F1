@@ -1,0 +1,8 @@
+1|RBR|Red Bull Racing|Austria|1
+2|FER|Scuderia Ferrari|Italia|1
+3|MER|Mercedes AMG|Alemania|1
+4|MCL|McLaren|Reino Unido|1
+5|AST|Aston Martin|Reino Unido|1
+6|WIL|Williams Racing|Reino Unido|1
+7|ALP|Alpine|Francia|1
+8|MIN|Minardi|Italia|0
