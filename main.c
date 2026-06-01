@@ -34,6 +34,7 @@ int main(){
     free(vectorEscuderias);
     printf("\n");
 
+
     printf("--- MIGRACION FINALIZADA ---\n");
 
     return 0;
@@ -89,3 +90,5 @@ int trozarEscuderia(void* vec, size_t tam, const char* linea){
     sscanf(linea_copia, "%u", &e->id);
     return TODO_OK;
 }
+
+

@@ -59,4 +59,5 @@ void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 
 
+
 #endif // LIBRARY_H_INCLUDED
