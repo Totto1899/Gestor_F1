@@ -90,37 +90,59 @@ int generarLotePilotosTXT(const char* nomArch) {
     return TODO_OK;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void crearLote(const char* nomArc)
-{
-    tPiloto pil[]={{1,"Martinez", "Español", 1,0,'A', 121212},
-                    {2,"Gomez", "Argentino", 2,0,'A', 123243},
-                    {3, "gonzalez", "Italiano",5,0,'A', 234312}};
-
-    FILE* pfPiol=fopen(nomArc, "wb");
-    if(!pfPiol)
-    {
-        printf("error");
+void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*)){
+    void* ult = vec + (ce-1)*tam;
+    void* men;
+    while(vec<ult){
+        men = buscar_menor(vec, ce, tam, cmp);
+        mswap(men, vec, tam);
+        vec +=tam;
+        ce--;
     }
-    fwrite(pil, sizeof(tPiloto),1,pfPiol);
-    fclose(pfPiol);
+}
+
+void mswap(void* a, void* b, size_t tam){
+    int i;
+    char temp;
+    for(i=0; i<tam; i++){
+        temp = *(char*)a;
+        *(char*)a = *(char*)b;
+        *(char*)b = temp;
+        a++;
+        b++;
+    }
+}
+
+void* buscar_menor(const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*)){
+    void* men = (void*)vec;
+    void* ult = (void*)vec + ce*tam;
+    void* ini = (void*)vec;
+    while(ini<ult){
+        if(cmp(men, ini)>0)
+            men = ini;
+        ini += tam;
+    }
+    return men;
+}
+
+void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
+               int cmp(const void*, const void*)){
+
+    size_t elem_izq;
+    void* pm;
+    int res;
+    while(ce > 0){
+        elem_izq = ce / 2;
+        pm = (void*)vec + (elem_izq * tam);
+        res = cmp(clave, pm);
+        if(res==0)
+            return pm;
+        else if(res > 0){
+            vec = pm + tam;
+            ce = ce - elem_izq - 1;
+        }
+        else
+            ce = elem_izq;
+    }
+    return NULL;
 }

@@ -58,5 +58,13 @@ void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
                    int* cant_registros, int trozarCamposLongVariable(void*, size_t, const char*));
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 
+///BUSQUEDA
+void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
+void* buscarSecuencial(void* vec, size_t ce, size_t tam, const void* clave);
+
+///ORDENAMIENTO
+void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
+void mswap(void* a, void* b, size_t tam);
+void* buscar_menor(const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
 
 #endif // LIBRARY_H_INCLUDED
