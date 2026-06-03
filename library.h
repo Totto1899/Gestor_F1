@@ -17,6 +17,10 @@
 #define ARCH_CARRERA "carreras.dat"
 #define ARCH_BAJAS "bajas.dat"
 
+//MACROS DE MENU
+#define MENU "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+
+
 //BIBLIOTECAS UTILIZADAS
 #include<stdio.h>
 #include<stdlib.h>
@@ -47,17 +51,35 @@ typedef struct{
     unsigned long long fecha;
     int estado;
     int cant_resultados;
-    int** mat_resultados;
+    int mat_resultados[][2];
 }tCarrera;
 
 /// FUNCIONES
 
 int generarLoteEscuderiasTXT(const char* nomArch);
 int generarLotePilotosTXT(const char* nomArch);
+int generarLoteArchivoCarrera(const char* nom);
+
 void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
                    int* cant_registros, int trozarCamposLongVariable(void*, size_t, const char*));
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
+int generarLoteArchivoCarrea(const char* nom);
 
+///MENUS
+char menuBase(const char* msj, const char* opc);
+void mandarFunciones(const char op);
+
+///MOSTRAR COSAS
+void mostrarPilotos();
+
+///BUSQUEDA
+void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
+void* buscarSecuencial(void* vec, size_t ce, size_t tam, const void* clave);
+
+///ORDENAMIENTO
+void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
+void mswap(void* a, void* b, size_t tam);
+void* buscar_menor(const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
 
 
 #endif // LIBRARY_H_INCLUDED

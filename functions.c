@@ -89,7 +89,125 @@ int generarLotePilotosTXT(const char* nomArch) {
     fclose(pf);
     return TODO_OK;
 }
+///matriz: el primer numero es el id_piloto y el segundo la cantidad de puntos que gana
+/*int generarLoteArchivoCarrera(const char* nom)
+{
+    FILE* pf = fopen(nom, "wb");
+    int ce=2;
+    ///0=terminada 1=
+    tCarrera vec[]={{1,"Mónaco",01062026,1,10,{{101,12},{102,25},{103,8},{104,15},{105,18},{106,1},{107,4},{108,2},{109,10},{110,6}}},
+                    {2,"Japón",02062026,1,10,
+                                            {101,0,
+                                            102,25,
+                                            103,18,
+                                            104,0,
+                                            105,1,
+                                            106,4,
+                                            107,0,
+                                            108,0,
+                                            109,0,
+                                            110,0}}};
+    if (!pf)
+        return ERR_AP;
+    fwrite(&vec,sizeof(tCarrera),(sizeof(vec)/sizeof(tCarrera)),pf);
+    fclose(pf);
 
+    return TODO_OK;
+}
+*/
 
+void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*)){
+    void* ult = vec + (ce-1)*tam;
+    void* men;
+    while(vec<ult){
+        men = buscar_menor(vec, ce, tam, cmp);
+        mswap(men, vec, tam);
+        vec +=tam;
+        ce--;
+    }
+}
 
+void mswap(void* a, void* b, size_t tam){
+    int i;
+    char temp;
+    for(i=0; i<tam; i++){
+        temp = *(char*)a;
+        *(char*)a = *(char*)b;
+        *(char*)b = temp;
+        a++;
+        b++;
+    }
+}
 
+void* buscar_menor(const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*)){
+    void* men = (void*)vec;
+    void* ult = (void*)vec + ce*tam;
+    void* ini = (void*)vec;
+    while(ini<ult){
+        if(cmp(men, ini)>0)
+            men = ini;
+        ini += tam;
+    }
+    return men;
+}
+
+void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
+               int cmp(const void*, const void*)){
+
+    size_t elem_izq;
+    void* pm;
+    int res;
+    while(ce > 0){
+        elem_izq = ce / 2;
+        pm = (void*)vec + (elem_izq * tam);
+        res = cmp(clave, pm);
+        if(res==0)
+            return pm;
+        else if(res > 0){
+            vec = pm + tam;
+            ce = ce - elem_izq - 1;
+        }
+        else
+            ce = elem_izq;
+    }
+    return NULL;
+}
+
+void mostrarPilotos()
+{
+    FILE* pf=fopen(ARCH_PILOTO,"rb");
+    tPiloto aux;
+    if(pf==NULL)
+    {
+         printf("error");
+    }
+    fread(&aux,sizeof(tPiloto),1,pf);
+    printf("----PILOTOS DE F1----");
+    while(!feof(pf))
+    {
+        printf("\n %s %u", aux.nombre, aux.puntos_acumulados);
+        fread(&aux,sizeof(tPiloto),1,pf);
+    }
+    fclose(pf);
+}
+
+char menuBase(const char* msj, const char* opc)
+{
+    char op;
+
+    do
+    {
+        printf("%s",msj);
+        fflush(stdin);
+        scanf("%c",&op);
+    }while(strchr(opc,op)==NULL);
+
+    return op;
+}
+
+void mandarFunciones(const char op)
+{
+    if(op=='1')
+        mostrarPilotos();
+
+}
