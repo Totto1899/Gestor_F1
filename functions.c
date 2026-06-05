@@ -272,11 +272,25 @@ void mostrarPilotosFun(const char* arc, void mostrar(void*))
         puts("\n");
         fread(&aux, sizeof(tPiloto), 1,pf);
     }
+
+
+void mostrarPilotos(void* aux){
+    FILE* pf=fopen(ARCH_PILOTO,"rb");
+    tPiloto aux;
+    if(pf==NULL)
+    {
+         printf("error");
+    }
+    fread(&aux,sizeof(tPiloto),1,pf);
+    printf("----PILOTOS DE F1----");
+    while(!feof(pf)){
+        printf("\n %s %u", aux.nombre, aux.puntos_acumulados);
+        fread(&aux,sizeof(tPiloto),1,pf);
+    }
     fclose(pf);
 }
 
-char plantillaMenu(const char* msj, const char* opc)
-{
+char menuBase(const char* msj, const char* opc){
     char op;
 
     do
@@ -288,7 +302,6 @@ char plantillaMenu(const char* msj, const char* opc)
 
     return op;
 }
-
 
 void mandarFunciones(const char op)
 {
@@ -320,5 +333,5 @@ int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, voi
     }
     fclose(pfBin);
     fclose(pfTXT);
-    return TODO_OK;
+    TODO_OK;
 }

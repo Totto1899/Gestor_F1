@@ -3,6 +3,8 @@
 int trozarPilotos(void* vec, size_t tam, const char* linea);
 int trozarEscuderia(void* vec, size_t tam, const char* linea);
 
+void mostrarPiloto(void* aux);
+
 int main(){
     generarLoteEscuderiasTXT(CARGA_ESCUD);
     generarLotePilotosTXT(CARGA_PILOTO);
@@ -37,16 +39,19 @@ int main(){
 
     printf("[*] Creando carrera...\n");
     ///solo una carrera
-///    generarLoteArchivoCarrera(ARCH_CARRERA);
+    ///generarLoteArchivoCarrera(ARCH_CARRERA);
 
 
     printf("--- MIGRACION FINALIZADA ---\n");
-    char op=plantillaMenu(MENUBASE,"123456");
 
+
+    //char op=plantillaMenu(MENUBASE,"123456");
+    char op=menuBase(MENU,"123456");
     while(op!='6')
     {
         mandarFunciones(op);
         op=plantillaMenu(MENUBASE,"123456");
+        op=menuBase(MENU,"123456");
     }
 
     printf("\n ----GRACIAS POR EJECUTAR----");

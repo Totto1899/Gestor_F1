@@ -2,11 +2,22 @@
 1780494572 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\functions.c
 	"library.h"
 
-1780496850 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\main.c
+1780620133 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\main.c
 	"library.h"
 
-1780496871 c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\library.h
+1780619743 c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\library.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+
+1780344002 source:c:\users\pc\documents\github\gestor_f1\functions.c
+	"library.h"
+
+1780350224 c:\users\pc\documents\github\gestor_f1\library.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1780346998 source:c:\users\pc\documents\github\gestor_f1\main.c
+	"library.h"
 

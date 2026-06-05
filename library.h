@@ -18,7 +18,11 @@
 #define ARCH_BAJAS "bajas.dat"
 
 //MACROS DE MENU
+
 #define MENUBASE "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS Y SUS PILOTOS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+
+#define MENU "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+
 
 
 //BIBLIOTECAS UTILIZADAS
@@ -58,6 +62,8 @@ typedef struct{
     int estado;
     int cant_resultados;
     tResultado* matriz;
+    int mat_resultados[][2];
+
 }tCarrera;
 
 
@@ -82,8 +88,14 @@ void mandarFunciones(const char op);
 ///MOSTRAR COSAS
 void mostrarPilotosFun(const char* arc, void mostrar(void*));
 void mostrarEdcuderias();
-void mostrarPiloto(void* aux);
 
+
+///MENUS
+char menuBase(const char* msj, const char* opc);
+void mandarFunciones(const char op);
+
+///MOSTRAR COSAS
+void mostrarPilotos();
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
