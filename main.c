@@ -6,6 +6,7 @@ int trozarEscuderia(void* vec, size_t tam, const char* linea);
 int main(){
     generarLoteEscuderiasTXT(CARGA_ESCUD);
     generarLotePilotosTXT(CARGA_PILOTO);
+
     printf("--- INICIANDO MIGRACION DE DATOS F1 ---\n\n");
 
     printf("[*] Procesando Pilotos...\n");
@@ -34,8 +35,21 @@ int main(){
     free(vectorEscuderias);
     printf("\n");
 
-    printf("--- MIGRACION FINALIZADA ---\n");
+    printf("[*] Creando carrera...\n");
+    ///solo una carrera
+///    generarLoteArchivoCarrera(ARCH_CARRERA);
 
+
+    printf("--- MIGRACION FINALIZADA ---\n");
+    char op=plantillaMenu(MENUBASE,"123456");
+
+    while(op!='6')
+    {
+        mandarFunciones(op);
+        op=plantillaMenu(MENUBASE,"123456");
+    }
+
+    printf("\n ----GRACIAS POR EJECUTAR----");
     return 0;
 }
 
@@ -89,3 +103,10 @@ int trozarEscuderia(void* vec, size_t tam, const char* linea){
     sscanf(linea_copia, "%u", &e->id);
     return TODO_OK;
 }
+
+void mostrarPiloto(void* aux)
+{
+    tPiloto* v = (tPiloto*)aux;
+    printf(" %s %d", v->nombre, v->puntos_acumulados);
+}
+

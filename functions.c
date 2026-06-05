@@ -89,6 +89,32 @@ int generarLotePilotosTXT(const char* nomArch) {
     fclose(pf);
     return TODO_OK;
 }
+///matriz: el primer numero es el id_piloto y el segundo la cantidad de puntos que gana
+/*int generarLoteArchivoCarrera(const char* nom)
+{
+    FILE* pf = fopen(nom, "wb");
+    int ce=2;
+    ///0=terminada 1=
+    tCarrera vec[]={{1,"Mónaco",01062026,1,10,{{101,12},{102,25},{103,8},{104,15},{105,18},{106,1},{107,4},{108,2},{109,10},{110,6}}},
+                    {2,"Japón",02062026,1,10,
+                                            {101,0,
+                                            102,25,
+                                            103,18,
+                                            104,0,
+                                            105,1,
+                                            106,4,
+                                            107,0,
+                                            108,0,
+                                            109,0,
+                                            110,0}}};
+    if (!pf)
+        return ERR_AP;
+    fwrite(&vec,sizeof(tCarrera),(sizeof(vec)/sizeof(tCarrera)),pf);
+    fclose(pf);
+
+    return TODO_OK;
+}
+*/
 
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*)){
     void* ult = vec + (ce-1)*tam;
@@ -145,4 +171,154 @@ void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
             ce = elem_izq;
     }
     return NULL;
+}
+
+void* mmap(void* vec, size_t ce, size_t tam, void action(void*)){
+    void* r = vec;
+    int i;
+    for(i=0; i<ce ; i++){
+        action(vec);
+        vec+=tam;
+    }
+    return r;
+}
+
+int filter(void* vec, size_t ce, size_t tam, int ffilter(const void*, size_t* ce)){
+    void* end = vec+(ce*tam);
+    void* pr = vec;
+    void* pw = vec;
+    int cant_filtrada = 0;
+    while(pr<end){
+        if(ffilter(pr, &ce)){
+            if(pr!=pw)
+                memmove(pw, pr, tam);
+            pw += tam;
+        }
+        else
+            cant_filtrada++;
+        pr += tam;
+    }
+    return cant_filtrada;
+}
+
+void reduce(void* vec, size_t ce, size_t tam, void* d, int fred(void*, const void*)){
+    int i;
+    for(i=0; i<ce ; i++){
+        fred(d, vec);
+        vec+=tam;
+    }
+}
+
+void* mi_memcpy(void* destino, const void* origen, size_t n){
+    char* end = (char*)origen+n;
+    char* temp_d = (char*)destino;
+    const char* temp_o = (const char*)origen;
+    while(temp_o<end){
+        *temp_d = *temp_o;
+        temp_o++;
+        temp_d++;
+    }
+    return destino;
+}
+
+void* mi_memmove(void* destino, const void* origen, size_t n){
+    if(n==0)
+        return destino;
+    if(destino<origen){
+        char* end = (char*)origen+n;
+        char* temp_d = (char*)destino;
+        const char* temp_o = (const char*)origen;
+        while(temp_o<end){
+            *temp_d = *temp_o;
+            temp_o++;
+            temp_d++;
+        }
+    }
+    else{
+        char* beg = (char*)origen;
+        char* temp_d = (char*)destino+n-1;
+        const char* temp_o = (const char*)origen+n-1;
+        while(temp_o>=beg){
+            *temp_d = *temp_o;
+            temp_d--;
+            temp_o--;
+        }
+    }
+    return destino;
+}
+
+int contElementos(const char* nomArch, size_t tam){
+    FILE* pf = fopen(nomArch, "rb");
+    if(!pf)
+        return ERR_AP;
+    fseek(pf, 0, SEEK_END);
+    long bytes_totales = ftell(pf);
+    fclose(pf);
+    return (size_t)(bytes_totales/tam);
+}
+
+///FUNCIONALIDADES MINIMAS
+
+void mostrarPilotosFun(const char* arc, void mostrar(void*))
+{
+    FILE* pf=fopen(arc,"rb");
+    tPiloto aux;
+    if(pf==NULL)
+        printf("error");
+    fread(&aux, sizeof(tPiloto), 1,pf);
+    while(!feof(pf))
+    {
+        mostrar(&aux);
+        puts("\n");
+        fread(&aux, sizeof(tPiloto), 1,pf);
+    }
+    fclose(pf);
+}
+
+char plantillaMenu(const char* msj, const char* opc)
+{
+    char op;
+
+    do
+    {
+        printf("%s",msj);
+        fflush(stdin);
+        scanf("%c",&op);
+    }while(strchr(opc,op)==NULL);
+
+    return op;
+}
+
+
+void mandarFunciones(const char op)
+{
+    char aux;
+    switch(op){
+        case '1':
+            mostrarPilotosFun(ARCH_PILOTO, mostrarPiloto);
+            break;
+        case '7':
+            aux = plantillaMenu("quue quere","123");
+            //TERNARIO
+    }
+}
+
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*)){
+    char linea[MAX_LINEA];
+    FILE* pfBin = fopen(nomArchBin, "rb");
+    if(!pfBin)
+        return ERR_AP;
+    FILE* pfTXT = fopen(nomArchTXT, "wt");
+    if(!pfTXT){
+        fclose(pfBin);
+        return ERR_AP;
+    }
+    fread(linea, tam, 1, pfBin);
+    while(!feof(pfBin)){
+        grabar(linea, pfTXT);
+        fread(linea, tam, 1, pfBin);
+    }
+    fclose(pfBin);
+    fclose(pfTXT);
+    return TODO_OK;
 }
