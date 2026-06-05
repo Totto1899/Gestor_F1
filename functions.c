@@ -274,7 +274,7 @@ void mostrarPilotosFun(const char* arc, void mostrar(void*))
     }
 
 
-void mostrarPilotos(void* aux){
+void mostrarPilotos(){
     FILE* pf=fopen(ARCH_PILOTO,"rb");
     tPiloto aux;
     if(pf==NULL)
