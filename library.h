@@ -18,7 +18,7 @@
 #define ARCH_BAJAS "bajas.dat"
 
 //MACROS DE MENU
-#define MENU "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+#define MENUBASE "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS Y SUS PILOTOS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
 
 
 //BIBLIOTECAS UTILIZADAS
@@ -66,11 +66,14 @@ int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 int generarLoteArchivoCarrea(const char* nom);
 
 ///MENUS
-char menuBase(const char* msj, const char* opc);
+char plantillaMenu(const char* msj, const char* opc);
 void mandarFunciones(const char op);
 
 ///MOSTRAR COSAS
-void mostrarPilotos();
+void mostrarPilotosFun(const char*, int mostrarPiloto(tPiloto*));
+void mostrarEdcuderias();
+void mostrarPiloto(tPiloto* aux);
+
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));

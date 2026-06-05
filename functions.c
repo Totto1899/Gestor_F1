@@ -173,25 +173,22 @@ void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
     return NULL;
 }
 
-void mostrarPilotos()
+void mostrarPilotosFun(const char* arc, int mostrarPiloto(tPiloto*))
 {
-    FILE* pf=fopen(ARCH_PILOTO,"rb");
+    FILE* pf=fopen(arc,"rb");
     tPiloto aux;
     if(pf==NULL)
-    {
-         printf("error");
-    }
-    fread(&aux,sizeof(tPiloto),1,pf);
-    printf("----PILOTOS DE F1----");
+        printf("error");
+    fread(&aux, sizeof(tPiloto), 1,pf);
     while(!feof(pf))
     {
-        printf("\n %s %u", aux.nombre, aux.puntos_acumulados);
-        fread(&aux,sizeof(tPiloto),1,pf);
+        mostrarPiloto(&aux);
+        fread(&aux, sizeof(tPiloto), 1,pf);
     }
     fclose(pf);
 }
 
-char menuBase(const char* msj, const char* opc)
+char plantillaMenu(const char* msj, const char* opc)
 {
     char op;
 
@@ -205,9 +202,10 @@ char menuBase(const char* msj, const char* opc)
     return op;
 }
 
+
 void mandarFunciones(const char op)
 {
     if(op=='1')
-        mostrarPilotos();
+        mostrarPilotosFun(ARCH_PILOTO, mostrarPiloto);
 
 }

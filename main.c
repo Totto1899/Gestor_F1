@@ -41,12 +41,12 @@ int main(){
 
 
     printf("--- MIGRACION FINALIZADA ---\n");
-    char op=menuBase(MENU,"123456");
+    char op=plantillaMenu(MENUBASE,"123456");
 
     while(op!='6')
     {
         mandarFunciones(op);
-        op=menuBase(MENU,"123456");
+        op=plantillaMenu(MENUBASE,"123456");
     }
 
     printf("\n ----GRACIAS POR EJECUTAR----");
@@ -104,4 +104,8 @@ int trozarEscuderia(void* vec, size_t tam, const char* linea){
     return TODO_OK;
 }
 
+void mostrarPiloto(tPiloto* aux)
+{
+    printf("%d", aux->id);
+}
 
