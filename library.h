@@ -18,7 +18,10 @@
 #define ARCH_BAJAS "bajas.dat"
 
 //MACROS DE MENU
+
 #define MENUBASE "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS Y SUS PILOTOS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+
+#define MENU "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
 
 
 //BIBLIOTECAS UTILIZADAS
@@ -27,6 +30,12 @@
 #include<string.h>
 
 //TDAs
+typedef struct{
+    unsigned int id_piloto;
+    unsigned int posicion;
+    unsigned int total_puntos;
+}tResultado; //estado 0 invalida la carrera y no se tiene en cuenta (*matriz queda apuntando a NULL)
+
 typedef struct{
     unsigned int id;
     char nombre[30];
@@ -51,8 +60,12 @@ typedef struct{
     unsigned long long fecha;
     int estado;
     int cant_resultados;
+    tResultado* matriz;
     int mat_resultados[][2];
+
 }tCarrera;
+
+
 
 /// FUNCIONES
 
@@ -64,6 +77,17 @@ void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
                    int* cant_registros, int trozarCamposLongVariable(void*, size_t, const char*));
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 int generarLoteArchivoCarrea(const char* nom);
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*));
+int contElementos(const char* nomArch, size_t tam);
+
+///MENUS
+char plantillaMenu(const char* msj, const char* opc);
+void mandarFunciones(const char op);
+
+///MOSTRAR COSAS
+void mostrarPilotosFun(const char* arc, void mostrar(void*));
+void mostrarEdcuderias();
+
 
 ///MENUS
 char plantillaMenu(const char* msj, const char* opc);
@@ -84,5 +108,11 @@ void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
 void mswap(void* a, void* b, size_t tam);
 void* buscar_menor(const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
 
+///PROCESAMIENTO
+void* mmap(void* vec, size_t ce, size_t tam, void action(void*));
+int filter(void* vec, size_t ce, size_t tam, int fred(const void*, size_t* ce));
+void reduce(void* vec, size_t ce, size_t tam, void* d, int fred(void*, const void*));
+void* mi_memcpy(void* destino, const void* origen, size_t n);
+void* mi_memmove(void* destino, const void* origen, size_t n);
 
 #endif // LIBRARY_H_INCLUDED
