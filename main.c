@@ -3,6 +3,7 @@
 int trozarPilotos(void* vec, size_t tam, const char* linea);
 int trozarEscuderia(void* vec, size_t tam, const char* linea);
 
+///item 1
 int cmpPilotosPorPuntos(const void*, const void*);
 void mostrarPiloto(const void* v);
 
@@ -38,9 +39,9 @@ int main(){
     free(vectorEscuderias);
     printf("\n");
 
-    ///printf("[*] Creando carrera...\n");
-    ///solo una carrera
-    ///generarLoteArchivoCarrera(ARCH_CARRERA);
+    printf("[*] Creando carrera...\n");
+    generarLoteArchivoCarrera(ARCH_CARRERA, ARCH_PILOTO);
+
     printf("--- MIGRACION FINALIZADA ---\n");
 
     int flag;

@@ -89,32 +89,53 @@ int generarLotePilotosTXT(const char* nomArch) {
     fclose(pf);
     return TODO_OK;
 }
-///matriz: el primer numero es el id_piloto y el segundo la cantidad de puntos que gana
-/*int generarLoteArchivoCarrera(const char* nom)
-{
-    FILE* pf = fopen(nom, "wb");
-    int ce=2;
-    ///0=terminada 1=
-    tCarrera vec[]={{1,"Mónaco",01062026,1,10,{{101,12},{102,25},{103,8},{104,15},{105,18},{106,1},{107,4},{108,2},{109,10},{110,6}}},
-                    {2,"Japón",02062026,1,10,
-                                            {101,0,
-                                            102,25,
-                                            103,18,
-                                            104,0,
-                                            105,1,
-                                            106,4,
-                                            107,0,
-                                            108,0,
-                                            109,0,
-                                            110,0}}};
-    if (!pf)
-        return ERR_AP;
-    fwrite(&vec,sizeof(tCarrera),(sizeof(vec)/sizeof(tCarrera)),pf);
-    fclose(pf);
 
+int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
+    unsigned int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
+    int i;
+    int ce_pil = contElementos(nomArchPil, sizeof(tPiloto));
+    tPiloto* vecPil = malloc(ce_pil*sizeof(tPiloto));
+    if(!vecPil)
+        return ERR_MEM;
+    FILE* pfPil = fopen(nomArchPil, "rb");
+    if(!pfPil){
+        free(vecPil);
+        return ERR_AP;
+    }
+    fread(vecPil, sizeof(tPiloto), ce_pil, pfPil);
+    fclose(pfPil);
+    FILE* pfCar = fopen(nomArchCar, "wb");
+    if(!pfCar){
+        free(vecPil);
+        return ERR_AP;
+    }
+    tCarrera car_aux;
+    car_aux.id = 1;
+    strcpy(car_aux.circuito, "Monza");
+    car_aux.fecha = (unsigned long long)time(NULL);
+    car_aux.estado = 1;
+    car_aux.cant_resultados = ce_pil;
+    car_aux.matriz = malloc(ce_pil*sizeof(tResultado));
+    if(!car_aux.matriz){
+        free(vecPil);
+        fclose(pfCar);
+        return ERR_MEM;
+    }
+    for(i=0; i<ce_pil; i++){
+        car_aux.matriz[i].id_piloto = vecPil[i].id;
+        car_aux.matriz[i].posicion = i+1;
+        if(i<10)
+            car_aux.matriz[i].total_puntos = puntos_f1[i];
+        else
+            car_aux.matriz[i].total_puntos = 0;
+    }
+    fwrite(&car_aux, sizeof(tCarrera), 1, pfCar);
+    fwrite(car_aux.matriz, sizeof(tResultado), ce_pil, pfCar);
+    free(vecPil);
+    free(car_aux.matriz);
+    fclose(pfCar);
     return TODO_OK;
 }
-*/
 
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*)){
     void* ult = vec + (ce-1)*tam;

@@ -37,6 +37,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<time.h>
 
 //TDAs
 typedef struct{
@@ -70,21 +71,16 @@ typedef struct{
     int estado;
     int cant_resultados;
     tResultado* matriz;
-    int mat_resultados[][2];
-
 }tCarrera;
-
-
 
 ///FUNCIONES
 
 int generarLoteEscuderiasTXT(const char* nomArch);
 int generarLotePilotosTXT(const char* nomArch);
-int generarLoteArchivoCarrera(const char* nom);
+int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil);
 void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
                    int* cant_registros, int trozarCamposLongVariable(void*, size_t, const char*));
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
-int generarLoteArchivoCarrea(const char* nom);
 int contElementos(const char* nomArch, size_t tam);
 
 ///MENUS
