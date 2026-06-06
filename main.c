@@ -3,7 +3,8 @@
 int trozarPilotos(void* vec, size_t tam, const char* linea);
 int trozarEscuderia(void* vec, size_t tam, const char* linea);
 
-void mostrarPiloto(void* aux);
+int cmpPilotosPorPuntos(const void*, const void*);
+void mostrarPiloto(const void* v);
 
 int main(){
     generarLoteEscuderiasTXT(CARGA_ESCUD);
@@ -16,8 +17,8 @@ int main(){
     int ce_pilotos = 0;
     tPiloto* vectorPilotos = malloc(cap_pilotos * sizeof(tPiloto));
     if (!vectorPilotos){
-        printf(ERR_MEM);
-        return -1;
+        printf("\nNo se pudo reservar memoria para los pilotos");
+        return -3;
     }
     vectorPilotos = cargaInicial(CARGA_PILOTO, vectorPilotos, sizeof(tPiloto), &cap_pilotos,&ce_pilotos, trozarPilotos);
     volcarABinario(ARCH_PILOTO, vectorPilotos, sizeof(tPiloto), ce_pilotos);
@@ -29,32 +30,54 @@ int main(){
     int ce_escu = 0;
     tEscuderia* vectorEscuderias = malloc(cap_escu * sizeof(tEscuderia));
     if (!vectorEscuderias){
-        printf(ERR_MEM);
-        return -1;
+        printf("\nNo se pudo reservar memoria para las escuderias");
+        return -3;
     }
     vectorEscuderias = cargaInicial(CARGA_ESCUD, vectorEscuderias, sizeof(tEscuderia), &cap_escu, &ce_escu, trozarEscuderia);
     volcarABinario(ARCH_ESCUD, vectorEscuderias, sizeof(tEscuderia), ce_escu);
     free(vectorEscuderias);
     printf("\n");
 
-    printf("[*] Creando carrera...\n");
+    ///printf("[*] Creando carrera...\n");
     ///solo una carrera
     ///generarLoteArchivoCarrera(ARCH_CARRERA);
-
-
     printf("--- MIGRACION FINALIZADA ---\n");
 
+    int flag;
+    char op = 0;
 
-    //char op=plantillaMenu(MENUBASE,"123456");
-    char op=menuBase(MENU,"123456");
-    while(op!='6')
-    {
-        mandarFunciones(op);
-        op=plantillaMenu(MENUBASE,"123456");
-        op=menuBase(MENU,"123456");
-    }
-
-    printf("\n ----GRACIAS POR EJECUTAR----");
+    do{
+        system("cls");
+        op = menuBase(MENUBASE, OPCIONES_MENU);
+        switch(op){
+            case '1':
+                flag = listarPilotosPuntos(ARCH_PILOTO, cmpPilotosPorPuntos, mostrarPiloto);
+                if(flag==-1)
+                    printf("\nNo se pudo abrir el archivo de pilotos.dat");
+                else if(flag==-3)
+                    printf("\nNo se pudo reservar memoria.");
+                break;
+            case '2':
+                break;
+            case '3':
+                break;
+            case'4':
+                break;
+            case '5':
+                break;
+            case '6':
+                break;
+            case '7':
+                break;
+            case '8':
+                printf("\n ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
+                break;
+        }
+        if(op!='8'){
+            printf("\n");
+            system("pause");
+        }
+    }while(op!='8');
     return 0;
 }
 
@@ -109,9 +132,13 @@ int trozarEscuderia(void* vec, size_t tam, const char* linea){
     return TODO_OK;
 }
 
-void mostrarPiloto(void* aux)
-{
-    tPiloto* v = (tPiloto*)aux;
-    printf(" %s %d", v->nombre, v->puntos_acumulados);
+int cmpPilotosPorPuntos(const void* a, const void* b){
+    tPiloto* pilotoA = (tPiloto*)a;
+    tPiloto* pilotoB = (tPiloto*)b;
+    return pilotoB->puntos_acumulados - pilotoA->puntos_acumulados;
 }
 
+void mostrarPiloto(const void* v){
+    tPiloto* pil = (tPiloto*)v;
+    printf("ID: %d | Nombre: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
+}

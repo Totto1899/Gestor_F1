@@ -7,7 +7,7 @@
 #define ERR_AP -1
 #define ERR_ESCRITURA -2
 #define TODO_OK 1
-#define ERR_MEM "No se pudo reservar memoria"
+#define ERR_MEM -3
 
 //MACROS DE ARCHIVOS
 #define CARGA_PILOTO "pilotos.txt"
@@ -19,11 +19,19 @@
 
 //MACROS DE MENU
 
-#define MENUBASE "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS Y SUS PILOTOS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+#define MENUBASE "\n\t---- GESTOR DE F1 ----\n" \
+                 "\tINGRESE LA OPCIÓN DESEADA:\n" \
+                 "\t1 - Listar pilotos y sus puntos\n" \
+                 "\t2 - Registrar una carrera (ingreso de posiciones)\n" \
+                 "\t3 - Calcular y actualizar puntos automáticamente\n" \
+                 "\t4 - Mostrar ranking de pilotos de la temporada\n" \
+                 "\t5 - Mostrar pilotos por escudería\n" \
+                 "\t6 - Calcular estadísticas de pilotos\n" \
+                 "\t7 - Exportar datos a archivos de texto\n" \
+                 "\t8 - Finalizar programa\n" \
+                 "\t--> "
 
-#define MENU "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
-
-
+#define OPCIONES_MENU "12345678"
 
 //BIBLIOTECAS UTILIZADAS
 #include<stdio.h>
@@ -68,34 +76,23 @@ typedef struct{
 
 
 
-/// FUNCIONES
+///FUNCIONES
 
 int generarLoteEscuderiasTXT(const char* nomArch);
 int generarLotePilotosTXT(const char* nomArch);
 int generarLoteArchivoCarrera(const char* nom);
-
 void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
                    int* cant_registros, int trozarCamposLongVariable(void*, size_t, const char*));
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 int generarLoteArchivoCarrea(const char* nom);
-int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*));
 int contElementos(const char* nomArch, size_t tam);
 
 ///MENUS
-char plantillaMenu(const char* msj, const char* opc);
-void mandarFunciones(const char op);
-
-///MOSTRAR COSAS
-void mostrarPilotosFun(const char* arc, void mostrar(void*));
-void mostrarEdcuderias();
-
-
-///MENUS
 char menuBase(const char* msj, const char* opc);
-void mandarFunciones(const char op);
 
-///MOSTRAR COSAS
-void mostrarPilotos();
+///FUNCIONALIDADES MINIMAS
+int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*));
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));

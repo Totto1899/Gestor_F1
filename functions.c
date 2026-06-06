@@ -257,63 +257,38 @@ int contElementos(const char* nomArch, size_t tam){
     return (size_t)(bytes_totales/tam);
 }
 
-///FUNCIONALIDADES MINIMAS
-
-void mostrarPilotosFun(const char* arc, void mostrar(void*))
-{
-    FILE* pf=fopen(arc,"rb");
-    tPiloto aux;
-    if(pf==NULL)
-        printf("error");
-    fread(&aux, sizeof(tPiloto), 1,pf);
-    while(!feof(pf))
-    {
-        mostrar(&aux);
-        puts("\n");
-        fread(&aux, sizeof(tPiloto), 1,pf);
-    }
-
-
-void mostrarPilotos(){
-    FILE* pf=fopen(ARCH_PILOTO,"rb");
-    tPiloto aux;
-    if(pf==NULL)
-    {
-         printf("error");
-    }
-    fread(&aux,sizeof(tPiloto),1,pf);
-    printf("----PILOTOS DE F1----");
-    while(!feof(pf)){
-        printf("\n %s %u", aux.nombre, aux.puntos_acumulados);
-        fread(&aux,sizeof(tPiloto),1,pf);
-    }
-    fclose(pf);
-}
-
 char menuBase(const char* msj, const char* opc){
     char op;
-
-    do
-    {
+    do{
         printf("%s",msj);
         fflush(stdin);
-        scanf("%c",&op);
+        scanf(" %c",&op);
     }while(strchr(opc,op)==NULL);
-
     return op;
 }
 
-void mandarFunciones(const char op)
-{
-    char aux;
-    switch(op){
-        case '1':
-            mostrarPilotosFun(ARCH_PILOTO, mostrarPiloto);
-            break;
-        case '7':
-            aux = plantillaMenu("quue quere","123");
-            //TERNARIO
+///FUNCIONALIDADES MINIMAS
+
+int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*)){
+    tPiloto* vec;
+    size_t ce;
+    int i;
+    FILE* pf = fopen(nomArch, "rb");
+    if(!pf)
+        return ERR_AP;
+    ce = contElementos(nomArch, sizeof(tPiloto));
+    vec = malloc(ce*sizeof(tPiloto));
+    if(!vec){
+        fclose(pf);
+        return ERR_MEM;
     }
+    fread(vec, sizeof(tPiloto), ce, pf);
+    ssort(vec, ce, sizeof(tPiloto), cmp);
+    for(i=0; i<ce; i++)
+        mostrar(vec+i);
+    free(vec);
+    fclose(pf);
+    return TODO_OK;
 }
 
 int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*)){
@@ -333,5 +308,5 @@ int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, voi
     }
     fclose(pfBin);
     fclose(pfTXT);
-    TODO_OK;
+    return TODO_OK;
 }
