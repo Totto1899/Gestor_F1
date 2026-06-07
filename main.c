@@ -3,7 +3,10 @@
 int trozarPilotos(void* vec, size_t tam, const char* linea);
 int trozarEscuderia(void* vec, size_t tam, const char* linea);
 
-///item 1
+///item 2
+int cmpPilotorPorId(const void* clave, const void* registro);
+
+///item 4
 int cmpPilotosPorPuntos(const void*, const void*);
 void mostrarPiloto(const void* v);
 
@@ -52,33 +55,42 @@ int main(){
         op = menuBase(MENUBASE, OPCIONES_MENU);
         switch(op){
             case '1':
-                flag = listarPilotosPuntos(ARCH_PILOTO, cmpPilotosPorPuntos, mostrarPiloto);
+                flag = listarPilotos(ARCH_PILOTO, mostrarPiloto);
                 if(flag==-1)
                     printf("\nNo se pudo abrir el archivo de pilotos.dat");
-                else if(flag==-3)
-                    printf("\nNo se pudo reservar memoria.");
                 break;
             case '2':
+                flag = registrarCarrera(ARCH_CARRERA, ARCH_PILOTO, cmpPilotorPorId);
+                if(flag==ERR_AP)
+                    printf("\nNo se pudo abrir el archivo de carreras.dat");
+                else if(flag==ERR_MEM)
+                    printf("\nNo se pudo reservar memoria.");
+                else if(flag==ERR_ACT)
+                    printf("\nSe registro la carrera, pero no se pudo actualizar pilotos.dat");
                 break;
             case '3':
+                flag = listarPilotosPuntos(ARCH_PILOTO, cmpPilotosPorPuntos, mostrarPiloto);
+                if(flag==ERR_AP)
+                    printf("\nNo se pudo abrir el archivo de pilotos.dat");
+                else if(flag==ERR_MEM)
+                    printf("\nNo se pudo reservar memoria.");
                 break;
             case'4':
                 break;
             case '5':
                 break;
             case '6':
+                menuExportarATXT();
                 break;
             case '7':
-                break;
-            case '8':
                 printf("\n ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
                 break;
         }
-        if(op!='8'){
+        if(op!='7'){
             printf("\n");
             system("pause");
         }
-    }while(op!='8');
+    }while(op!='7');
     return 0;
 }
 
@@ -142,4 +154,10 @@ int cmpPilotosPorPuntos(const void* a, const void* b){
 void mostrarPiloto(const void* v){
     tPiloto* pil = (tPiloto*)v;
     printf("ID: %d | Nombre: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
+}
+
+int cmpPilotorPorId(const void* clave, const void* registro){
+    int id_buscado = *(int*)clave;
+    tPiloto* pil = (tPiloto*)registro;
+    return id_buscado - pil->id;
 }

@@ -8,6 +8,8 @@
 #define ERR_ESCRITURA -2
 #define TODO_OK 1
 #define ERR_MEM -3
+#define ERR_BUSQUEDA -4
+#define ERR_ACT -5
 
 //MACROS DE ARCHIVOS
 #define CARGA_PILOTO "pilotos.txt"
@@ -21,17 +23,24 @@
 
 #define MENUBASE "\n\t---- GESTOR DE F1 ----\n" \
                  "\tINGRESE LA OPCIÓN DESEADA:\n" \
-                 "\t1 - Listar pilotos y sus puntos\n" \
-                 "\t2 - Registrar una carrera (ingreso de posiciones)\n" \
-                 "\t3 - Calcular y actualizar puntos automáticamente\n" \
-                 "\t4 - Mostrar ranking de pilotos de la temporada\n" \
-                 "\t5 - Mostrar pilotos por escudería\n" \
-                 "\t6 - Calcular estadísticas de pilotos\n" \
-                 "\t7 - Exportar datos a archivos de texto\n" \
-                 "\t8 - Finalizar programa\n" \
+                 "\t1 - Listar pilotos\n" \
+                 "\t2 - Registrar una carrera\n" \
+                 "\t3 - Mostrar ranking de pilotos de la temporada\n" \
+                 "\t4 - Mostrar pilotos por escudería\n" \
+                 "\t5 - Calcular estadísticas de pilotos\n" \
+                 "\t6 - Exportar datos a archivos de texto\n" \
+                 "\t7 - Finalizar programa\n" \
                  "\t--> "
 
-#define OPCIONES_MENU "12345678"
+#define MENU_EXPORTACION "\n=== MENU DE EXPORTACION A TXT ===\n" \
+                         "1. Exportar Pilotos\n" \
+                         "2. Exportar Escuderias\n" \
+                         "3. Exportar Carreras\n" \
+                         "4. Exportar Bajas\n" \
+                         "0. Volver al menu principal\n" \
+                         "Elija una opcion: "
+
+#define OPCIONES_MENU "1234567"
 
 //BIBLIOTECAS UTILIZADAS
 #include<stdio.h>
@@ -87,12 +96,19 @@ int contElementos(const char* nomArch, size_t tam);
 char menuBase(const char* msj, const char* opc);
 
 ///FUNCIONALIDADES MINIMAS
-int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));
-int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*));
+int listarPilotos(const char* nomArch, void mostrar(const void*));///1
+int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
+int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos);///3
+int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));///4
+void menuExportarATXT();///7
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const void*, FILE*)); ///7
+void grabarPilotoTXT(const void* registro, FILE* pfTXT);
+void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);
+int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
-void* buscarSecuencial(void* vec, size_t ce, size_t tam, const void* clave);
+int buscarEnArchivo(const char* nomArch, const void* clave, size_t tam, int cmp(const void*, const void*));
 
 ///ORDENAMIENTO
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
