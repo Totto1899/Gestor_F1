@@ -7,7 +7,8 @@
 #define ERR_AP -1
 #define ERR_ESCRITURA -2
 #define TODO_OK 1
-#define ERR_MEM "No se pudo reservar memoria"
+#define ERR_MEM -3
+#define CARACMAX 30
 
 //MACROS DE ARCHIVOS
 #define CARGA_PILOTO "pilotos.txt"
@@ -19,15 +20,41 @@
 
 //MACROS DE MENU
 
-#define MENUBASE "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS Y SUS PILOTOS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+#define MENUBASE "\n\t---- GESTOR DE F1 ----\n" \
+                 "\tINGRESE LA OPCI�N DESEADA:\n" \
+                 "\t1 - Listar pilotos y sus puntos\n" \
+                 "\t2 - Registrar una carrera (ingreso de posiciones)\n" \
+                 "\t3 - Calcular y actualizar puntos autom�ticamente\n" \
+                 "\t4 - Mostrar ranking de pilotos de la temporada\n" \
+                 "\t5 - Mostrar pilotos por escuder�a\n" \
+                 "\t6 - Calcular estad�sticas de pilotos\n" \
+                 "\t7 - ABM de archivos\n"\
+                 "\t8 - Exportar datos a archivos de texto\n" \
+                 "\t9 - Finalizar programa\n" \
+                 "\t--> "
 
-#define MENU "\t----GESTOR DE F1----\n \tINGRESE LO QUE DESEE HACER: \n\t1- VER LOS CORREDORES Y SUS PUNTAJES\n \t2- VER LAS ESCUDERRIAS\n \t3- VER ESTADISTICAS DE PILOTOS\n  \t5- EXPORTAR A ARCHIVOS DE TEXTO\n \t6- FINALIZAR PROGRAMA\n --> "
+#define MENUABM "\n\t----INGRESE LA ACCIONES QUE QUIERE REALIZAR ----\n"\
+                "\t1 - Ingresar un registro\n"\
+                "\t2 - Dar de baja un registro\n"\
+                "\t3 - Modificar un registro\n"\
+                "\t4 - Volver para atras\n"\
+                "\t-->"
 
+#define MENUABMARCHIVOS "\n\t----INGRESE SOBRE QUE ARCHIVO ----\n"\
+                        "\t1 - Pilotos\n"\
+                        "\t2 - Escuderias\n"\
+                        "\t3 - Carreras\n"\
+                        "\t4 - Volver al manu\n"\
+                        "\t-->"
+#define OPCIONES_MENU "123456789"
+#define OPCIONES_ABM "1234"
 
 //BIBLIOTECAS UTILIZADAS
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<time.h>
+#include<ctype.h>
 
 //TDAs
 typedef struct{
@@ -61,43 +88,31 @@ typedef struct{
     int estado;
     int cant_resultados;
     tResultado* matriz;
-    int mat_resultados[][2];
-
 }tCarrera;
 
-
-
-/// FUNCIONES
+///FUNCIONES
 
 int generarLoteEscuderiasTXT(const char* nomArch);
 int generarLotePilotosTXT(const char* nomArch);
-int generarLoteArchivoCarrera(const char* nom);
-
+int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil);
 void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
                    int* cant_registros, int trozarCamposLongVariable(void*, size_t, const char*));
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
-int generarLoteArchivoCarrea(const char* nom);
-int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*));
 int contElementos(const char* nomArch, size_t tam);
 
 ///MENUS
-char plantillaMenu(const char* msj, const char* opc);
-void mandarFunciones(const char op);
+char menuBase(const char* msj, const char* opc);
 
-///MOSTRAR COSAS
-void mostrarPilotosFun(const char* arc, void mostrar(void*));
-void mostrarEdcuderias();
+///FUNCIONALIDADES MINIMAS
+int funcionesABM(const char* piloto, const char* escu, const char* carrera);
+void ingresarRegPiloto(FILE* pf);
+void ingresarRegEscuderia(FILE* pf);
+void ingresarRegCarrera(FILE* pf);
 
 
-///MENUS
-char plantillaMenu(const char* msj, const char* opc);
-void mandarFunciones(const char op);
 
-///MOSTRAR COSAS
-void mostrarPilotosFun(const char*, int mostrarPiloto(tPiloto*));
-void mostrarEdcuderias();
-void mostrarPiloto(tPiloto* aux);
-
+int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*));
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));

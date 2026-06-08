@@ -89,32 +89,53 @@ int generarLotePilotosTXT(const char* nomArch) {
     fclose(pf);
     return TODO_OK;
 }
-///matriz: el primer numero es el id_piloto y el segundo la cantidad de puntos que gana
-/*int generarLoteArchivoCarrera(const char* nom)
-{
-    FILE* pf = fopen(nom, "wb");
-    int ce=2;
-    ///0=terminada 1=
-    tCarrera vec[]={{1,"Mónaco",01062026,1,10,{{101,12},{102,25},{103,8},{104,15},{105,18},{106,1},{107,4},{108,2},{109,10},{110,6}}},
-                    {2,"Japón",02062026,1,10,
-                                            {101,0,
-                                            102,25,
-                                            103,18,
-                                            104,0,
-                                            105,1,
-                                            106,4,
-                                            107,0,
-                                            108,0,
-                                            109,0,
-                                            110,0}}};
-    if (!pf)
-        return ERR_AP;
-    fwrite(&vec,sizeof(tCarrera),(sizeof(vec)/sizeof(tCarrera)),pf);
-    fclose(pf);
 
+int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
+    unsigned int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
+    int i;
+    int ce_pil = contElementos(nomArchPil, sizeof(tPiloto));
+    tPiloto* vecPil = malloc(ce_pil*sizeof(tPiloto));
+    if(!vecPil)
+        return ERR_MEM;
+    FILE* pfPil = fopen(nomArchPil, "rb");
+    if(!pfPil){
+        free(vecPil);
+        return ERR_AP;
+    }
+    fread(vecPil, sizeof(tPiloto), ce_pil, pfPil);
+    fclose(pfPil);
+    FILE* pfCar = fopen(nomArchCar, "wb");
+    if(!pfCar){
+        free(vecPil);
+        return ERR_AP;
+    }
+    tCarrera car_aux;
+    car_aux.id = 1;
+    strcpy(car_aux.circuito, "Monza");
+    car_aux.fecha = (unsigned long long)time(NULL);
+    car_aux.estado = 1;
+    car_aux.cant_resultados = ce_pil;
+    car_aux.matriz = malloc(ce_pil*sizeof(tResultado));
+    if(!car_aux.matriz){
+        free(vecPil);
+        fclose(pfCar);
+        return ERR_MEM;
+    }
+    for(i=0; i<ce_pil; i++){
+        car_aux.matriz[i].id_piloto = vecPil[i].id;
+        car_aux.matriz[i].posicion = i+1;
+        if(i<10)
+            car_aux.matriz[i].total_puntos = puntos_f1[i];
+        else
+            car_aux.matriz[i].total_puntos = 0;
+    }
+    fwrite(&car_aux, sizeof(tCarrera), 1, pfCar);
+    fwrite(car_aux.matriz, sizeof(tResultado), ce_pil, pfCar);
+    free(vecPil);
+    free(car_aux.matriz);
+    fclose(pfCar);
     return TODO_OK;
 }
-*/
 
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*)){
     void* ult = vec + (ce-1)*tam;
@@ -173,39 +194,243 @@ void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
     return NULL;
 }
 
-void mostrarPilotosFun(const char* arc, int mostrarPiloto(tPiloto*))
-{
-    FILE* pf=fopen(arc,"rb");
-    tPiloto aux;
-    if(pf==NULL)
-        printf("error");
-    fread(&aux, sizeof(tPiloto), 1,pf);
-    while(!feof(pf))
-    {
-        mostrarPiloto(&aux);
-        fread(&aux, sizeof(tPiloto), 1,pf);
+void* mmap(void* vec, size_t ce, size_t tam, void action(void*)){
+    void* r = vec;
+    int i;
+    for(i=0; i<ce ; i++){
+        action(vec);
+        vec+=tam;
     }
-    fclose(pf);
+    return r;
 }
 
-char plantillaMenu(const char* msj, const char* opc)
-{
-    char op;
+int filter(void* vec, size_t ce, size_t tam, int ffilter(const void*, size_t* ce)){
+    void* end = vec+(ce*tam);
+    void* pr = vec;
+    void* pw = vec;
+    int cant_filtrada = 0;
+    while(pr<end){
+        if(ffilter(pr, &ce)){
+            if(pr!=pw)
+                memmove(pw, pr, tam);
+            pw += tam;
+        }
+        else
+            cant_filtrada++;
+        pr += tam;
+    }
+    return cant_filtrada;
+}
 
-    do
-    {
+void reduce(void* vec, size_t ce, size_t tam, void* d, int fred(void*, const void*)){
+    int i;
+    for(i=0; i<ce ; i++){
+        fred(d, vec);
+        vec+=tam;
+    }
+}
+
+void* mi_memcpy(void* destino, const void* origen, size_t n){
+    char* end = (char*)origen+n;
+    char* temp_d = (char*)destino;
+    const char* temp_o = (const char*)origen;
+    while(temp_o<end){
+        *temp_d = *temp_o;
+        temp_o++;
+        temp_d++;
+    }
+    return destino;
+}
+
+void* mi_memmove(void* destino, const void* origen, size_t n){
+    if(n==0)
+        return destino;
+    if(destino<origen){
+        char* end = (char*)origen+n;
+        char* temp_d = (char*)destino;
+        const char* temp_o = (const char*)origen;
+        while(temp_o<end){
+            *temp_d = *temp_o;
+            temp_o++;
+            temp_d++;
+        }
+    }
+    else{
+        char* beg = (char*)origen;
+        char* temp_d = (char*)destino+n-1;
+        const char* temp_o = (const char*)origen+n-1;
+        while(temp_o>=beg){
+            *temp_d = *temp_o;
+            temp_d--;
+            temp_o--;
+        }
+    }
+    return destino;
+}
+
+int contElementos(const char* nomArch, size_t tam){
+    FILE* pf = fopen(nomArch, "rb");
+    if(!pf)
+        return ERR_AP;
+    fseek(pf, 0, SEEK_END);
+    long bytes_totales = ftell(pf);
+    fclose(pf);
+    return (size_t)(bytes_totales/tam);
+}
+
+char menuBase(const char* msj, const char* opc){
+    char op;
+    do{
         printf("%s",msj);
         fflush(stdin);
-        scanf("%c",&op);
+        scanf(" %c",&op);
     }while(strchr(opc,op)==NULL);
-
     return op;
 }
 
+///FUNCIONALIDADES MINIMAS
 
-void mandarFunciones(const char op)
+int funcionesABM(const char* piloto, const char* escu, const char* carrera)
 {
-    if(op=='1')
-        mostrarPilotosFun(ARCH_PILOTO, mostrarPiloto);
+    char opAccion, opArchivo;
 
+
+    opAccion=menuBase(MENUABM,OPCIONES_ABM);
+    opArchivo=menuBase(MENUABMARCHIVOS,OPCIONES_ABM);
+
+    FILE* pf=fopen((opArchivo=='1'?piloto:(opArchivo=='2'?escu:carrera)),"r+b");
+
+    if(pf==NULL)
+        return ERR_AP;
+
+    switch(opAccion){
+        case '1':
+            (opArchivo=='1'?ingresarRegPiloto(pf):(opArchivo=='2'?ingresarRegEscuderia(pf):ingresarRegCarrera(pf)));
+            break;
+        case '2':
+            break;
+        case '3':
+            break;
+        case '4':
+            break;
+    }
+    fclose(pf);
+
+}
+void ingresarRegEscuderia(FILE* pf)
+{
+    unsigned int auxId;
+    tEscuderia aux;
+
+    fseek(pf,-sizeof(tEscuderia),SEEK_END);
+    fread(&aux,sizeof(tEscuderia),1,pf);
+    auxId=aux.id+1;
+
+    aux.id=auxId;
+    printf("Ingrese el codigo de escuderia: ");
+    fflush(stdin);
+    gets(aux.codigo);
+
+    printf("Ingrese el nombre de la escuderia: ");
+    fflush(stdin);
+    gets(aux.nombre);
+
+    printf("Ingrese el pais de  la escuderia: ");
+    fflush(stdin);
+    gets(aux.pais);
+
+    do
+    {
+        printf("Ingrese el codigo de escuderia: ");
+        scanf("%d", aux.estado);
+    }while(aux.estado!=1 && aux.estado!=0);
+
+    fseek(pf,0,SEEK_END);
+    fwrite(&aux,sizeof(tEscuderia),1,pf);
+}
+void ingresarRegCarrera(FILE* pf)
+{
+    printf("hola");
+}
+void ingresarRegPiloto(FILE* pf)
+{
+    unsigned int auxId;
+    tPiloto aux;
+
+    fseek(pf,-(sizeof(tPiloto)),SEEK_END);
+    fread(&aux,sizeof(tPiloto),1,pf);
+    auxId=(aux.id)+1;
+
+    aux.id=auxId;
+
+    printf("\n\tIngrese el nombre del piloto: ");
+    fflush(stdin);
+    gets(aux.nombre);
+
+    printf("\n\tIngrese la nacionalidad del piloto: ");
+    fflush(stdin);
+    gets(aux.nacionalidad);
+
+    printf("\n\tIngrese la escuderia del piloto: ");
+    scanf("%d", &aux.id_escuderia);
+
+    printf("\n\tIngrese los puntos acumulados del piloto: ");
+    scanf("%d", &aux.puntos_acumulados);
+
+    do
+    {
+        printf("\n\tIngrese el estado del piloto(A:Activo, R:Retirado, S:Suspendido): ");
+        fflush(stdin);
+        scanf("%c", &aux.estado);
+        toupper(aux.estado);
+    }while(aux.estado!='A'&&aux.estado!='R'&&aux.estado!='S');
+
+    printf("\n\tIngrese la fecha de nacimiento del piloto: ");
+    scanf("%llu", &aux.fechaNacimiento);
+
+    fseek(pf,0,SEEK_END);
+    fwrite(&aux,sizeof(tPiloto),1,pf);
+}
+
+
+int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*)){
+    tPiloto* vec;
+    size_t ce;
+    int i;
+    FILE* pf = fopen(nomArch, "rb");
+    if(!pf)
+        return ERR_AP;
+    ce = contElementos(nomArch, sizeof(tPiloto));
+    vec = malloc(ce*sizeof(tPiloto));
+    if(!vec){
+        fclose(pf);
+        return ERR_MEM;
+    }
+    fread(vec, sizeof(tPiloto), ce, pf);
+    ssort(vec, ce, sizeof(tPiloto), cmp);
+    for(i=0; i<ce; i++)
+        mostrar(vec+i);
+    free(vec);
+    fclose(pf);
+    return TODO_OK;
+}
+
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*)){
+    char linea[MAX_LINEA];
+    FILE* pfBin = fopen(nomArchBin, "rb");
+    if(!pfBin)
+        return ERR_AP;
+    FILE* pfTXT = fopen(nomArchTXT, "wt");
+    if(!pfTXT){
+        fclose(pfBin);
+        return ERR_AP;
+    }
+    fread(linea, tam, 1, pfBin);
+    while(!feof(pfBin)){
+        grabar(linea, pfTXT);
+        fread(linea, tam, 1, pfBin);
+    }
+    fclose(pfBin);
+    fclose(pfTXT);
+    return TODO_OK;
 }
