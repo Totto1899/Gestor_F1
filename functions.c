@@ -309,7 +309,7 @@ char menuBase(const char* msj, const char* opc){
     return op;
 }
 
-        ///FUNCIONALIDADES MINIMAS
+///FUNCIONALIDADES MINIMAS
 
 int funcionesABM(const char* piloto, const char* escu, const char* carrera)
 {
@@ -327,12 +327,13 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera)
 
     switch(opAccion){
         case '1':
-            (opArchivo=='1'?ingresarRegPiloto(pf):ingresarRegEscuderia(pf));
+            opArchivo=='1'?ingresarRegPiloto(pf, sizeof(tPiloto)):ingresarRegEscuderia(pf, sizeof(tEscuderia));
             break;
         case '2':
-            bajaRegPiloto(pf, sizeof(tPiloto),piloto,cmpPilotorPorId);
+///            bajaRegPiloto(pf, sizeof(tPiloto),piloto, ARCH_BAJAS);
             break;
         case '3':
+            opArchivo=='1'?modifiPiloto(pf, piloto,sizeof(tPiloto)): modifiEscuderia(pf, escu,sizeof(tEscuderia));
             break;
         case '4':
             break;
@@ -341,7 +342,153 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera)
     return TODO_OK;
 }
 
+tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam)
+{
+    int enco=0;
+    tPiloto reg;
 
+    rewind(pf);
+    fread(&reg,tam,1,pf);
+    while(!feof(pf) && !enco)
+    {
+        if(reg.id==clave)
+            enco=1;
+        else
+            fread(&reg,tam,1,pf);
+    }
+    if(!enco)
+        reg.id=-1;
+    return reg;
+}
+tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam)
+{
+    int enco=0;
+    tEscuderia reg;
+
+    rewind(pf);
+    fread(&reg,tam,1,pf);
+    while(!feof(pf) && !enco)
+    {
+        if(reg.id==clave)
+            enco=1;
+        else
+            fread(&reg,tam,1,pf);
+    }
+    if(!enco)
+        reg.id=-1;
+    return reg;
+}
+
+void modifiEscuderia(FILE* pf, const char* arc, size_t tam)
+{
+    tEscuderia aux;
+    int auxId;
+    void* valor;
+    char op;
+    rewind(pf);
+
+    printf("Ingrese la id de la escuderia que quiere modificar: ");
+    scanf("%d", &auxId);
+
+    aux=busquedaEscuderia(pf,auxId,tam);
+
+    if(aux.id!=-1)
+    {
+        op=menuBase(MENU_MODIESCUDERIA,OPCIONES_MENUMODIESCUDERIA);
+        fseek(pf,-tam,SEEK_CUR);
+        printf("Ingrese el nuevo valor: ");
+        switch(op)
+        {
+        case '1':
+            valor=malloc(sizeof(char*));
+            fflush(stdin);
+            gets((char*)valor);
+            strcpy(aux.codigo, (char*)valor);
+            break;
+        case '2':
+            valor=malloc(sizeof(char*));
+            fflush(stdin);
+            gets((char*)valor);
+            strcpy(aux.nombre,(char*)valor);
+        case '3':
+            valor=malloc(sizeof(char*));
+            fflush(stdin);
+            gets((char*)valor);
+            strcpy(aux.pais,(char*)valor);
+            break;
+        case '4':
+            valor=malloc(sizeof(int));
+            scanf("%d", &valor);
+            aux.estado=(int)valor;
+        }
+        fwrite(&aux,tam,1,pf);
+        free(valor);
+    }
+}
+void modifiPiloto(FILE* pf, const char* arc, size_t tam)
+{
+    tPiloto aux;
+    int auxId;
+    void* valor;
+    char op;
+    rewind(pf);
+
+    printf("\tIngrese la id del piloto que quiere modificar: ");
+    scanf("%d", &auxId);
+
+
+    aux=busquedaPiloto(pf,auxId,tam);
+
+    if(aux.id!=-1)
+    {
+        fseek(pf,-tam,SEEK_CUR);
+        op=menuBase(MENU_MODIPILOTO,OPCIONES_MENUMODIPILOTO);
+        printf("\tIngrese el nuevo valor: ");
+
+        switch(op)
+        {
+        case '1':
+            valor=malloc(sizeof(char*));
+            fflush(stdin);
+            gets((char*)valor);
+            strcpy(aux.nombre,(char*)valor);
+            break;
+        case '2':
+            valor=malloc(sizeof(char*));
+            fflush(stdin);
+            gets((char*)valor);
+            strcpy(aux.nombre,(char*)valor);
+            break;
+        case '3':
+            valor=malloc(sizeof(unsigned int));
+            scanf("%u",&valor);
+            aux.id_escuderia=(unsigned int)valor;
+            break;
+        case '4':
+            valor=malloc(sizeof(char));
+            fflush(stdin);
+            scanf("%c", (char)valor);
+            aux.estado=(char)valor;
+            break;
+        case '5':
+            valor=malloc(sizeof(long long unsigned));
+            scanf("%llu", &valor);
+            aux.fechaNacimiento=(long long unsigned)valor;
+            break;
+        case '6':
+            valor= malloc(sizeof(unsigned));
+            scanf("%d", &valor);
+            aux.puntos_acumulados=(unsigned)valor;
+            break;
+        case '7':
+            break;
+        }
+        fwrite(&aux,tam,1,pf);
+        free(valor);
+    }
+}
+
+/*
 void bajaRegPiloto(FILE* pf, size_t tam, const char* arc,int cmp(const void*, const void*))
 {
     void* aux;
@@ -370,21 +517,16 @@ void bajaRegPiloto(FILE* pf, size_t tam, const char* arc,int cmp(const void*, co
     }
 
 }
+*/
 
-void cambio(const void* clave, void* reg)
-{
-    char estado=*(char*)clave;
-    tPiloto* pil=(tPiloto*)reg;
-    pil->estado=estado;
-}
 
-void ingresarRegEscuderia(FILE* pf)
+void ingresarRegEscuderia(FILE* pf, size_t tam)
 {
     unsigned int auxId;
     tEscuderia aux;
 
-    fseek(pf,-sizeof(tEscuderia),SEEK_END);
-    fread(&aux,sizeof(tEscuderia),1,pf);
+    fseek(pf,-tam,SEEK_END);
+    fread(&aux,tam,1,pf);
     auxId=aux.id+1;
 
     aux.id=auxId;
@@ -403,20 +545,20 @@ void ingresarRegEscuderia(FILE* pf)
     do
     {
         printf("\n\tIngrese el codigo de escuderia (1-Activo 0-Inactivo): ");
-        scanf("%d", aux.estado);
+        scanf("%u", &aux.estado);
     }while(aux.estado!=1 && aux.estado!=0);
 
     fseek(pf,0,SEEK_END);
-    fwrite(&aux,sizeof(tEscuderia),1,pf);
+    fwrite(&aux,tam,1,pf);
 }
 
-void ingresarRegPiloto(FILE* pf)
+void ingresarRegPiloto(FILE* pf, size_t tam)
 {
     unsigned int auxId;
     tPiloto aux;
 
-    fseek(pf,-(sizeof(tPiloto)),SEEK_END);
-    fread(&aux,sizeof(tPiloto),1,pf);
+    fseek(pf,-tam,SEEK_END);
+    fread(&aux,tam,1,pf);
     auxId=(aux.id)+1;
 
     aux.id=auxId;
@@ -433,7 +575,7 @@ void ingresarRegPiloto(FILE* pf)
     scanf("%d", &aux.id_escuderia);
 
     printf("\n\tIngrese los puntos acumulados del piloto: ");
-    scanf("%d", &aux.puntos_acumulados);
+    scanf("%u", &aux.puntos_acumulados);
 
     do
     {
@@ -447,7 +589,7 @@ void ingresarRegPiloto(FILE* pf)
     scanf("%llu", &aux.fechaNacimiento);
 
     fseek(pf,0,SEEK_END);
-    fwrite(&aux,sizeof(tPiloto),1,pf);
+    fwrite(&aux,tam,1,pf);
 }
 
 

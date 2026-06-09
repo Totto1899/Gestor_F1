@@ -46,6 +46,25 @@
                         "\t3 - Volver al menu\n"\
                         "\t-->"
 
+
+#define MENU_MODIPILOTO "\n\t----INGRESE QUE CAMPO QUIERE MODIFICAR----\n"\
+                        "\t1 - Nombre\n"\
+                        "\t2 - Nacionalidad\n"\
+                        "\t3 - Id escuderia\n"\
+                        "\t4 - Estado\n"\
+                        "\t5 - Fecha de nacimiento\n"\
+                        "\t6 - Puntos\n"\
+                        "\t7 - Volver al menu\n"\
+                        "\t-->"
+
+#define MENU_MODIESCUDERIA "\n\t----INGRESE QUE CAMPO QUIERE MODIFICAR----\n"\
+                            "\t1 - Codigo\n"\
+                            "\t2 - Nombre\n"\
+                            "\t3 - Pais\n"\
+                            "\t4 - Estado\n"\
+                            "\t5 - Volver al menu\n"\
+                            "\t-->"
+
 #define MENU_EXPORTACION "\n=== MENU DE EXPORTACION A TXT ===\n" \
                          "1. Exportar Pilotos\n" \
                          "2. Exportar Escuderias\n" \
@@ -65,6 +84,8 @@
 #define OPCIONES_MENU "12345678"
 #define OPCIONES_ABM "1234"
 #define OPCIONES_ABMARCH "123"
+#define OPCIONES_MENUMODIPILOTO "1234567"
+#define OPCIONES_MENUMODIESCUDERIA "12345"
 
 //BIBLIOTECAS UTILIZADAS
 #include<stdio.h>
@@ -119,6 +140,8 @@ typedef struct{
     tResultado* matriz;
 }tCarrera;
 
+
+
 ///FUNCIONES
 
 int generarLoteEscuderiasTXT(const char* nomArch);
@@ -134,11 +157,17 @@ char menuBase(const char* msj, const char* opc);
 
 ///FUNCIONALIDADES MINIMAS
 int funcionesABM(const char* piloto, const char* escu, const char* carrera);
-void ingresarRegPiloto(FILE* pf);
-void ingresarRegEscuderia(FILE* pf);
+void ingresarRegPiloto(FILE* pf, size_t tam);
+void ingresarRegEscuderia(FILE* pf, size_t tam);
 void ingresarRegCarrera(FILE* pf);
 void bajaRegPiloto(FILE* pf, size_t tam,const char* arc,int cmp(const void*, const void*));
 int cmpPilotorPorId(const void* clave, const void* registro);
+
+tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam);
+tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam);
+void modifiEscuderia(FILE* pf, const char* arc, size_t tam);
+void modifiPiloto(FILE* pf, const char* arc, size_t tam);
+
 
 
 int listarPilotos(const char* nomArch, void mostrar(const void*));///1
