@@ -8,7 +8,8 @@
 #define ERR_ESCRITURA -2
 #define TODO_OK 1
 #define ERR_MEM -3
-#define CARACMAX 30
+#define ERR_BUSQUEDA -4
+#define ERR_ACT -5
 
 //MACROS DE ARCHIVOS
 #define CARGA_PILOTO "pilotos.txt"
@@ -44,8 +45,16 @@
                         "\t1 - Pilotos\n"\
                         "\t2 - Escuderias\n"\
                         "\t3 - Carreras\n"\
-                        "\t4 - Volver al manu\n"\
+                        "\t4 - Volver al menu\n"\
                         "\t-->"
+
+#define MENU_EXPORTACION "\n=== MENU DE EXPORTACION A TXT ===\n" \
+                         "1. Exportar Pilotos\n" \
+                         "2. Exportar Escuderias\n" \
+                         "3. Exportar Carreras\n" \
+                         "4. Exportar Bajas\n" \
+                         "0. Volver al menu principal\n" \
+                         "Elija una opcion: "
 #define OPCIONES_MENU "123456789"
 #define OPCIONES_ABM "1234"
 
@@ -108,15 +117,23 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera);
 void ingresarRegPiloto(FILE* pf);
 void ingresarRegEscuderia(FILE* pf);
 void ingresarRegCarrera(FILE* pf);
+void bajaRegPiloto(FILE* pf, size_t tam,const char* arc,int cmp(const void*, const void*));
+int cmpPilotorPorId(const void* clave, const void* registro);
 
 
-
-int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));
-int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*));
+int listarPilotos(const char* nomArch, void mostrar(const void*));///1
+int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
+int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos);///3
+int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));///4
+void menuExportarATXT();///7
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const void*, FILE*)); ///7
+void grabarPilotoTXT(const void* registro, FILE* pfTXT);
+void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);
+int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
-void* buscarSecuencial(void* vec, size_t ce, size_t tam, const void* clave);
+int buscarEnArchivo(const char* nomArch, const void* clave, size_t tam, int cmp(const void*, const void*));
 
 ///ORDENAMIENTO
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));

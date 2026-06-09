@@ -91,7 +91,7 @@ int generarLotePilotosTXT(const char* nomArch) {
 }
 
 int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
-    unsigned int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
+    int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
     int i;
     int ce_pil = contElementos(nomArchPil, sizeof(tPiloto));
     tPiloto* vecPil = malloc(ce_pil*sizeof(tPiloto));
@@ -194,6 +194,28 @@ void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
     return NULL;
 }
 
+int buscarEnArchivo(const char* nomArch, const void* clave, size_t tam, int cmp(const void*, const void*)){
+    int encontrado = 0;
+    FILE* pf = fopen(nomArch, "rb");
+    if(!pf)
+        return ERR_AP;
+    void* pread = malloc(tam);
+    if(!pread){
+        fclose(pf);
+        return ERR_MEM;
+    }
+    fread(pread, tam, 1, pf);
+    while(!feof(pf) && !encontrado){
+        if(cmp(clave, pread)==0)
+            encontrado = 1;
+        else
+            fread(pread, tam, 1, pf);
+    }
+    fclose(pf);
+    free(pread);
+    return encontrado;
+}
+
 void* mmap(void* vec, size_t ce, size_t tam, void action(void*)){
     void* r = vec;
     int i;
@@ -282,13 +304,12 @@ char menuBase(const char* msj, const char* opc){
     char op;
     do{
         printf("%s",msj);
-        fflush(stdin);
         scanf(" %c",&op);
     }while(strchr(opc,op)==NULL);
     return op;
 }
 
-///FUNCIONALIDADES MINIMAS
+        ///FUNCIONALIDADES MINIMAS
 
 int funcionesABM(const char* piloto, const char* escu, const char* carrera)
 {
@@ -296,7 +317,8 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera)
 
 
     opAccion=menuBase(MENUABM,OPCIONES_ABM);
-    opArchivo=menuBase(MENUABMARCHIVOS,OPCIONES_ABM);
+    if(opAccion!='4')
+        opArchivo=menuBase(MENUABMARCHIVOS,OPCIONES_ABM);
 
     FILE* pf=fopen((opArchivo=='1'?piloto:(opArchivo=='2'?escu:carrera)),"r+b");
 
@@ -305,9 +327,10 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera)
 
     switch(opAccion){
         case '1':
-            (opArchivo=='1'?ingresarRegPiloto(pf):(opArchivo=='2'?ingresarRegEscuderia(pf):ingresarRegCarrera(pf)));
+            (opArchivo=='1'?ingresarRegPiloto(pf):(opArchivo=='2'?ingresarRegEscuderia(pf):registrarCarrera(carrera, piloto, cmpPilotorPorId)));
             break;
         case '2':
+            bajaRegPiloto(pf, sizeof(tPiloto),piloto,cmpPilotorPorId);
             break;
         case '3':
             break;
@@ -315,8 +338,50 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera)
             break;
     }
     fclose(pf);
+    return TODO_OK;
+}
+int cmpPilotorPorId(const void* clave,const void* registro){
+    int id_buscado = *(int*)clave;
+    tPiloto* pil = (tPiloto*)registro;
+    return id_buscado - pil->id;
+}
+
+void bajaRegPiloto(FILE* pf, size_t tam, const char* arc,int cmp(const void*, const void*))
+{
+    void* aux;
+    char auxEstado;
+    int auxId;
+
+    printf("\n Ingrese la id del piloto que desea dar de baja: ");
+    scanf("%d", &auxId);
+
+    printf("\n Ingrese en que estado esta: ");
+    fflush(stdin);
+    scanf("%c", &auxEstado);
+
+    fread(aux,tam,1,pf);
+
+    while(!feof(pf))
+    {
+        if((cmp(auxId,aux))==0)
+        {
+            fseek(pf,-tam,SEEK_CUR);
+            cambio(auxEstado, aux);
+            fwrite(aux,tam,1,pf);
+        }
+        fseek(pf,0,1);
+        fread(aux, tam,1,pf);
+    }
 
 }
+
+void cambio(const void* clave, void* reg)
+{
+    char estado=*(char*)clave;
+    tPiloto* pil=(tPiloto*)reg;
+    pil->estado=estado;
+}
+
 void ingresarRegEscuderia(FILE* pf)
 {
     unsigned int auxId;
@@ -327,31 +392,28 @@ void ingresarRegEscuderia(FILE* pf)
     auxId=aux.id+1;
 
     aux.id=auxId;
-    printf("Ingrese el codigo de escuderia: ");
+    printf("\n\tIngrese el codigo de escuderia: ");
     fflush(stdin);
     gets(aux.codigo);
 
-    printf("Ingrese el nombre de la escuderia: ");
+    printf("\n\tIngrese el nombre de la escuderia: ");
     fflush(stdin);
     gets(aux.nombre);
 
-    printf("Ingrese el pais de  la escuderia: ");
+    printf("\n\tIngrese el pais de  la escuderia: ");
     fflush(stdin);
     gets(aux.pais);
 
     do
     {
-        printf("Ingrese el codigo de escuderia: ");
+        printf("\n\tIngrese el codigo de escuderia (1-Activo 0-Inactivo): ");
         scanf("%d", aux.estado);
     }while(aux.estado!=1 && aux.estado!=0);
 
     fseek(pf,0,SEEK_END);
     fwrite(&aux,sizeof(tEscuderia),1,pf);
 }
-void ingresarRegCarrera(FILE* pf)
-{
-    printf("hola");
-}
+
 void ingresarRegPiloto(FILE* pf)
 {
     unsigned int auxId;
@@ -393,6 +455,20 @@ void ingresarRegPiloto(FILE* pf)
 }
 
 
+int listarPilotos(const char* nomArch, void mostrar(const void*)){
+    tPiloto p;
+    FILE* pf = fopen(nomArch, "rb");
+    if(!pf)
+        return ERR_AP;
+    fread(&p, sizeof(tPiloto), 1, pf);
+    while(!feof(pf)){
+        mostrar(&p);
+        fread(&p, sizeof(tPiloto), 1, pf);
+    }
+    fclose(pf);
+    return TODO_OK;
+}
+
 int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*)){
     tPiloto* vec;
     size_t ce;
@@ -415,8 +491,132 @@ int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), 
     return TODO_OK;
 }
 
-int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const char*, FILE*)){
-    char linea[MAX_LINEA];
+int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*)){
+    int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
+    int i, aux, piloto_valido, flag_advertencia = 0;
+    tCarrera pc;
+    tResultado* pActual;
+    FILE* pfCar = fopen(nomArchCar, "ab");
+    if(!pfCar)
+        return ERR_AP;
+
+    system("cls");
+    printf("Ingrese el id de la carrera: ");
+    scanf("%d", &pc.id);
+    printf("Ingrese el nombre del circuito: ");
+    scanf("%s", pc.circuito);
+    pc.estado = 1;
+    pc.fecha = (unsigned long long)time(NULL);
+    printf("Ingrese la cantidad de corredores: ");
+    scanf("%d", &pc.cant_resultados);
+    pc.matriz = malloc(pc.cant_resultados * sizeof(tResultado));
+    if(!pc.matriz){
+        fclose(pfCar);
+        return ERR_MEM;
+    }
+    pActual = pc.matriz;
+    for(i=0; i <pc.cant_resultados; i++){
+        do{
+            printf("\nIngrese el id del piloto %d: ", i+1);
+            scanf("%d", &aux);
+            piloto_valido = buscarEnArchivo(nomArchPil, &aux, sizeof(tPiloto), cmp);
+            if(piloto_valido == 0)
+                printf("Error: El corredor ingresado no esta registrado. Intente nuevamente.\n");
+        }while(piloto_valido == 0);
+
+        pActual->id_piloto = aux;
+        printf("Ingrese la posicion del piloto %d en la carrera: ", aux);
+        scanf("%d", &(pActual->posicion));
+        if(pActual->posicion > 0 && pActual->posicion <= 10)
+            pActual->total_puntos = puntos_f1[pActual->posicion - 1];
+        else
+            pActual->total_puntos = 0;
+        if(actualizarPuntosPiloto(nomArchPil, pActual->id_piloto, pActual->total_puntos)!=1)
+            flag_advertencia = 1;
+        pActual++;
+    }
+
+    fwrite(&pc, sizeof(tCarrera), 1, pfCar);
+    fwrite(pc.matriz, sizeof(tResultado), pc.cant_resultados, pfCar);
+
+    fclose(pfCar);
+    free(pc.matriz);
+
+    if(flag_advertencia==1)
+        return ERR_ACT;
+    return TODO_OK;
+}
+
+int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos){
+    tPiloto p;
+    int flag = 0;
+    FILE* pf = fopen(nomArch, "r+b");
+    if(!pf)
+        return ERR_AP;
+    fread(&p, sizeof(tPiloto), 1, pf);
+    while(!feof(pf) && flag==0){
+        if(p.id==id_pil){
+            flag = 1;
+            p.puntos_acumulados += puntos;
+            fseek(pf, -(long)sizeof(tPiloto), SEEK_CUR);
+            fwrite(&p, sizeof(tPiloto), 1, pf);
+        }
+        else
+            fread(&p, sizeof(tPiloto), 1, pf);
+    }
+    fclose(pf);
+    if(flag==1)
+        return TODO_OK;
+    else
+        return ERR_BUSQUEDA;
+}
+
+void menuExportarATXT(){
+    char opcion;
+    int estado;
+    do{
+        system("cls");
+        opcion = menuBase(MENU_EXPORTACION, "01234");
+        switch(opcion) {
+            case '1':
+                estado = exportarATXT(ARCH_PILOTO, "pilotos.txt", sizeof(tPiloto), grabarPilotoTXT);
+                if(estado == TODO_OK)
+                    printf("Pilotos exportados con exito!\n");
+                else
+                    printf("Error al exportar pilotos.\n");
+                system("pause");
+                break;
+            case '2':
+                estado = exportarATXT(ARCH_ESCUD, "escuderias.txt", sizeof(tEscuderia), grabarEscuderiaTXT);
+                if(estado == TODO_OK)
+                    printf("Escuderias exportadas con exito!\n");
+                else
+                    printf("Error al exportar escuderias.\n");
+                system("pause");
+                break;
+            case '3':
+                estado = exportarCarreraATXT(ARCH_CARRERA, "carreras.txt");
+                if(estado==TODO_OK)
+                    printf("Carreras exportadas con exito!\n");
+                else
+                    printf("Error al exportar carreras.\n");
+                system("pause");
+                break;
+
+            case '4':
+                estado = exportarATXT(ARCH_BAJAS, "bajas.txt", sizeof(tPiloto), grabarPilotoTXT);
+                if(estado == TODO_OK)
+                    printf("Bajas exportadas con exito!\n");
+                else
+                    printf("Error al exportar bajas.\n");
+                system("pause");
+                break;
+        }
+    } while(opcion != '0');
+}
+
+int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const void*, FILE*)){
+    void* dato;
     FILE* pfBin = fopen(nomArchBin, "rb");
     if(!pfBin)
         return ERR_AP;
@@ -425,10 +625,57 @@ int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, voi
         fclose(pfBin);
         return ERR_AP;
     }
-    fread(linea, tam, 1, pfBin);
+    dato = malloc(tam);
+    if(!dato){
+        fclose(pfBin);
+        fclose(pfTXT);
+        return ERR_MEM;
+    }
+    fread(dato, tam, 1, pfBin);
     while(!feof(pfBin)){
-        grabar(linea, pfTXT);
-        fread(linea, tam, 1, pfBin);
+        grabar(dato, pfTXT);
+        fread(dato, tam, 1, pfBin);
+    }
+    fclose(pfBin);
+    fclose(pfTXT);
+    return TODO_OK;
+}
+
+void grabarPilotoTXT(const void* registro, FILE* pfTXT){
+    tPiloto* pil = (tPiloto*)registro;
+    fprintf(pfTXT, "ID: %-4d | Piloto: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
+}
+
+void grabarEscuderiaTXT(const void* registro, FILE* pfTXT){
+    tEscuderia* esc = (tEscuderia*)registro;
+    fprintf(pfTXT, "ID: %-4d | Escuderia: %s\n", esc->id, esc->nombre);
+}
+
+int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT){
+    tCarrera pc;
+    tResultado res;
+    int i;
+    FILE* pfBin = fopen(nomArchBin, "rb");
+    if(!pfBin)
+        return ERR_AP;
+
+    FILE* pfTXT = fopen(nomArchTXT, "wt");
+    if(!pfTXT){
+        fclose(pfBin);
+        return ERR_AP;
+    }
+    fread(&pc, sizeof(tCarrera), 1, pfBin);
+    while(!feof(pfBin)) {
+        fprintf(pfTXT, "\n========================================\n");
+        fprintf(pfTXT, "CARRERA ID: %d | CIRCUITO: %s\n", pc.id, pc.circuito);
+        fprintf(pfTXT, "========================================\n");
+        fprintf(pfTXT, "POS | ID PILOTO | PUNTOS\n");
+        fprintf(pfTXT, "----------------------------------------\n");
+        for(i=0; i < pc.cant_resultados; i++){
+            fread(&res, sizeof(tResultado), 1, pfBin);
+            fprintf(pfTXT, "%-3d | %-9d | %d\n", res.posicion, res.id_piloto, res.total_puntos);
+        }
+        fread(&pc, sizeof(tCarrera), 1, pfBin);
     }
     fclose(pfBin);
     fclose(pfTXT);
