@@ -64,35 +64,30 @@ int generarLotePilotosTXT(const char* nomArch) {
     if (!pf)
         return ERR_AP;
     // Red Bull (Escudería 1)
-    fprintf(pf, "101|Max Verstappen|Neerlandesa|1|395|A|19970930\n");
-    fprintf(pf, "102|Sergio Perez|Mexicana|1|258|A|19900126\n");
-
+    fprintf(pf, "101|Max Verstappen|Neerlandesa|1|395|A|875577600\n");   // 1997-09-30
+    fprintf(pf, "102|Sergio Perez|Mexicana|1|258|A|633312000\n");        // 1990-01-26
     // Ferrari (Escudería 2)
-    fprintf(pf, "103|Charles Leclerc|Monegasca|2|280|A|19971016\n");
-    fprintf(pf, "104|Carlos Sainz|Espanola|2|200|A|19940901\n");
-
+    fprintf(pf, "103|Charles Leclerc|Monegasca|2|280|A|876960000\n");    // 1997-10-16
+    fprintf(pf, "104|Carlos Sainz|Espanola|2|200|A|778377600\n");        // 1994-09-01
     // Mercedes (Escudería 3)
-    fprintf(pf, "105|Lewis Hamilton|Britanica|3|220|A|19850107\n");
-    fprintf(pf, "106|George Russell|Britanica|3|160|A|19980215\n");
-
+    fprintf(pf, "105|Lewis Hamilton|Britanica|3|220|A|473904000\n");     // 1985-01-07
+    fprintf(pf, "106|George Russell|Britanica|3|160|A|887500800\n");     // 1998-02-15
     // McLaren (Escudería 4)
-    fprintf(pf, "107|Lando Norris|Britanica|4|195|A|19991113\n");
-    fprintf(pf, "108|Oscar Piastri|Australiana|4|150|A|20010406\n");
-
+    fprintf(pf, "107|Lando Norris|Britanica|4|195|A|942451200\n");       // 1999-11-13
+    fprintf(pf, "108|Oscar Piastri|Australiana|4|150|A|986515200\n");    // 2001-04-06
     // Aston Martin (Escudería 5)
-    fprintf(pf, "109|Fernando Alonso|Espanola|5|180|A|19810729\n");
-    fprintf(pf, "110|Lance Stroll|Canadiense|5|60|A|19981029\n");
-
+    fprintf(pf, "109|Fernando Alonso|Espanola|5|180|A|365212800\n");     // 1981-07-29
+    fprintf(pf, "110|Lance Stroll|Canadiense|5|60|A|909619200\n");       // 1998-10-29
     // Casos especiales para probar filtros de estado (Retirados / Suspendidos)
-    fprintf(pf, "111|Kimi Raikkonen|Finlandesa|2|0|R|19791017\n");
-    fprintf(pf, "112|Kevin Magnussen|Danesa|6|15|S|19921005\n");
+    fprintf(pf, "111|Kimi Raikkonen|Finlandesa|2|0|R|308966400\n");      // 1979-10-17
+    fprintf(pf, "112|Kevin Magnussen|Danesa|6|15|S|718243200\n");        // 1992-10-05
     fclose(pf);
     return TODO_OK;
 }
 
 int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
     int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
-    int i;
+    int i, j=0, cant_activos = 0;
     int ce_pil = contElementos(nomArchPil, sizeof(tPiloto));
     tPiloto* vecPil = malloc(ce_pil*sizeof(tPiloto));
     if(!vecPil)
@@ -104,6 +99,11 @@ int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
     }
     fread(vecPil, sizeof(tPiloto), ce_pil, pfPil);
     fclose(pfPil);
+
+    for(i=0; i<ce_pil; i++)
+        if((vecPil+i)->estado=='A')
+            cant_activos++;
+
     FILE* pfCar = fopen(nomArchCar, "wb");
     if(!pfCar){
         free(vecPil);
@@ -114,21 +114,26 @@ int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
     strcpy(car_aux.circuito, "Monza");
     car_aux.fecha = (unsigned long long)time(NULL);
     car_aux.estado = 1;
-    car_aux.cant_resultados = ce_pil;
-    car_aux.matriz = malloc(ce_pil*sizeof(tResultado));
+
+    car_aux.cant_resultados = cant_activos;
+    car_aux.matriz = malloc(cant_activos*sizeof(tResultado));
     if(!car_aux.matriz){
         free(vecPil);
         fclose(pfCar);
         return ERR_MEM;
     }
     for(i=0; i<ce_pil; i++){
-        car_aux.matriz[i].id_piloto = vecPil[i].id;
-        car_aux.matriz[i].posicion = i+1;
-        if(i<10)
-            car_aux.matriz[i].total_puntos = puntos_f1[i];
-        else
-            car_aux.matriz[i].total_puntos = 0;
+        if((vecPil+i)->estado=='A'){
+            (car_aux.matriz+j)->id_piloto = (vecPil+i)->id;
+            (car_aux.matriz+j)->posicion = j + 1;
+            if(j<10)
+                (car_aux.matriz+j)->total_puntos = puntos_f1[j];
+            else
+                (car_aux.matriz+j)->total_puntos = 0;
+            j++;
+        }
     }
+
     fwrite(&car_aux, sizeof(tCarrera), 1, pfCar);
     fwrite(car_aux.matriz, sizeof(tResultado), ce_pil, pfCar);
     free(vecPil);
@@ -180,7 +185,7 @@ void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
     int res;
     while(ce > 0){
         elem_izq = ce / 2;
-        pm = (void*)vec + (elem_izq * tam);
+        pm = (void*)vec + (elem_izq*tam);
         res = cmp(clave, pm);
         if(res==0)
             return pm;
@@ -194,25 +199,18 @@ void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
     return NULL;
 }
 
-int buscarEnArchivo(const char* nomArch, const void* clave, size_t tam, int cmp(const void*, const void*)){
+int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_t tam, int cmp(const void*, const void*)){
     int encontrado = 0;
     FILE* pf = fopen(nomArch, "rb");
     if(!pf)
         return ERR_AP;
-    void* pread = malloc(tam);
-    if(!pread){
-        fclose(pf);
-        return ERR_MEM;
-    }
-    fread(pread, tam, 1, pf);
-    while(!feof(pf) && !encontrado){
-        if(cmp(clave, pread)==0)
+    fread(destino, tam, 1, pf);
+    while(!feof(pf) && !encontrado)
+        if(cmp(clave, destino)==0)
             encontrado = 1;
         else
-            fread(pread, tam, 1, pf);
-    }
+            fread(destino, tam, 1, pf);
     fclose(pf);
-    free(pread);
     return encontrado;
 }
 
@@ -600,7 +598,8 @@ int listarPilotos(const char* nomArch, void mostrar(const void*)){
         return ERR_AP;
     fread(&p, sizeof(tPiloto), 1, pf);
     while(!feof(pf)){
-        mostrar(&p);
+        if(p.estado=='A')
+            mostrar(&p);
         fread(&p, sizeof(tPiloto), 1, pf);
     }
     fclose(pf);
@@ -623,7 +622,8 @@ int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), 
     fread(vec, sizeof(tPiloto), ce, pf);
     ssort(vec, ce, sizeof(tPiloto), cmp);
     for(i=0; i<ce; i++)
-        mostrar(vec+i);
+        if((vec+i)->estado=='A')
+            mostrar(vec+i);
     free(vec);
     fclose(pf);
     return TODO_OK;
@@ -634,6 +634,7 @@ int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(con
     int i, aux, piloto_valido, flag_advertencia = 0;
     tCarrera pc;
     tResultado* pActual;
+    tPiloto pil_aux;
     FILE* pfCar = fopen(nomArchCar, "ab");
     if(!pfCar)
         return ERR_AP;
@@ -657,9 +658,13 @@ int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(con
         do{
             printf("\nIngrese el id del piloto %d: ", i+1);
             scanf("%d", &aux);
-            piloto_valido = buscarEnArchivo(nomArchPil, &aux, sizeof(tPiloto), cmp);
+            piloto_valido = buscarEnArchivo(nomArchPil, &aux, &pil_aux, sizeof(tPiloto), cmp);
             if(piloto_valido == 0)
                 printf("Error: El corredor ingresado no esta registrado. Intente nuevamente.\n");
+            else if(pil_aux.estado != 'A'){
+                printf("El piloto %s se encuentra inactivo (Estado: %c).\n", pil_aux.nombre, pil_aux.estado);
+                piloto_valido = 0;
+            }
         }while(piloto_valido == 0);
 
         pActual->id_piloto = aux;
@@ -693,7 +698,7 @@ int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos){
         return ERR_AP;
     fread(&p, sizeof(tPiloto), 1, pf);
     while(!feof(pf) && flag==0){
-        if(p.id==id_pil){
+        if(p.id==id_pil && p.estado=='A'){
             flag = 1;
             p.puntos_acumulados += puntos;
             fseek(pf, -(long)sizeof(tPiloto), SEEK_CUR);
@@ -722,17 +727,19 @@ int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, voi
     }
     fread(&e, sizeof(tEscuderia), 1, pfEscu);
     while(!feof(pfEscu)){
-        printf("\n=== EQUIPO: %s ===\n", e.nombre);
-        rewind(pfPil);
-        fread(&p, sizeof(tPiloto), 1, pfPil);
-        while(!feof(pfPil)){
-            if(p.id_escuderia==e.id){
-                printf("\t");
-                mostrar(&p);
-            }
+        if(e.estado==1){
+            printf("\n=== EQUIPO: %s ===\n", e.nombre);
+            rewind(pfPil);
             fread(&p, sizeof(tPiloto), 1, pfPil);
+            while(!feof(pfPil)){
+                if(p.id_escuderia==e.id && p.estado=='A'){
+                    printf("\t");
+                    mostrar(&p);
+                }
+                fread(&p, sizeof(tPiloto), 1, pfPil);
+            }
+            fread(&e, sizeof(tEscuderia), 1, pfEscu);
         }
-        fread(&e, sizeof(tEscuderia), 1, pfEscu);
     }
     fclose(pfPil);
     fclose(pfEscu);
@@ -851,7 +858,7 @@ tEstadisticaPiloto* generarEstadisticas(size_t* ce){
     tCarrera car;
     tResultado res;
     tPiloto p;
-    int i = 0, pos;
+    int i = 0, pos, cant_activos = 0;
     *ce = contElementos(ARCH_PILOTO, sizeof(tPiloto));
     if(*ce==0)
         return NULL;
@@ -865,34 +872,43 @@ tEstadisticaPiloto* generarEstadisticas(size_t* ce){
     }
     fread(&p, sizeof(tPiloto), 1, pfPil);
     while(!feof(pfPil)){
-        (vec+i)->id_piloto = p.id;
-        strcpy((vec+i)->nombre, p.nombre);
-        (vec+i)->mejor_posicion = 999;
-        i++;
+        if(p.estado=='A'){
+            (vec+cant_activos)->id_piloto = p.id;
+            strcpy((vec+cant_activos)->nombre, p.nombre);
+            (vec+cant_activos)->mejor_posicion = 999;
+            cant_activos++;
+        }
         fread(&p, sizeof(tPiloto), 1, pfPil);
     }
     fclose(pfPil);
+    *ce = cant_activos;
 
     pfCar = fopen(ARCH_CARRERA, "rb");
-    if(!pfCar)
+    if(!pfCar){
+        free(vec);
         return NULL;
+    }
     fread(&car, sizeof(tCarrera), 1, pfCar);
     while(!feof(pfCar)){
         for(i=0; i<car.cant_resultados; i++){
             fread(&res, sizeof(tResultado), 1, pfCar);
-            pos = obtenerIndicePiloto(vec, *ce, res.id_piloto);
-            if(pos!= -1){
-                (vec+pos)->cant_carreras_corridas++;
-                (vec+pos)->suma_posiciones += res.posicion;
-                if(res.posicion==1)
-                    (vec+pos)->victorias++;
-                if(res.posicion < (vec+pos)->mejor_posicion)
-                    (vec+pos)->mejor_posicion = res.posicion;
-                if(res.posicion > (vec+pos)->peor_posicion)
-                    (vec+pos)->peor_posicion = res.posicion;
+            if(car.estado==1){
+                pos = obtenerIndicePiloto(vec, *ce, res.id_piloto);
+                if(pos!= -1){
+                    (vec+pos)->cant_carreras_corridas++;
+                    (vec+pos)->suma_posiciones += res.posicion;
+                    if(res.posicion==1)
+                        (vec+pos)->victorias++;
+                    if(res.posicion < (vec+pos)->mejor_posicion)
+                        (vec+pos)->mejor_posicion = res.posicion;
+                    if(res.posicion > (vec+pos)->peor_posicion)
+                        (vec+pos)->peor_posicion = res.posicion;
+                }
             }
         }
+        fread(&car, sizeof(tCarrera), 1, pfCar);
     }
+    fclose(pfCar);
     for(i=0; i<*ce; i++){
         if((vec+i)->cant_carreras_corridas>0)
             (vec+i)->promedio_posicion = (float)(vec+i)->suma_posiciones/(vec+i)->cant_carreras_corridas;
@@ -944,7 +960,6 @@ void menuExportarATXT(){
                     printf("Error al exportar carreras.\n");
                 system("pause");
                 break;
-
             case '4':
                 estado = exportarATXT(ARCH_BAJAS, "bajas.txt", sizeof(tPiloto), grabarPilotoTXT);
                 if(estado == TODO_OK)
@@ -954,7 +969,7 @@ void menuExportarATXT(){
                 system("pause");
                 break;
         }
-    } while(opcion != '0');
+    } while(opcion!='0');
 }
 
 int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const void*, FILE*)){
@@ -978,6 +993,7 @@ int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, voi
         grabar(dato, pfTXT);
         fread(dato, tam, 1, pfBin);
     }
+    free(dato);
     fclose(pfBin);
     fclose(pfTXT);
     return TODO_OK;
@@ -985,7 +1001,7 @@ int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, voi
 
 void grabarPilotoTXT(const void* registro, FILE* pfTXT){
     tPiloto* pil = (tPiloto*)registro;
-    fprintf(pfTXT, "ID: %-4d | Piloto: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
+    fprintf(pfTXT, "ID: %-4d | Piloto: %-20s | Estado: %c | Puntos: %d\n", pil->id, pil->nombre, pil->estado, pil->puntos_acumulados);
 }
 
 void grabarEscuderiaTXT(const void* registro, FILE* pfTXT){
@@ -1007,19 +1023,97 @@ int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT){
         return ERR_AP;
     }
     fread(&pc, sizeof(tCarrera), 1, pfBin);
-    while(!feof(pfBin)) {
-        fprintf(pfTXT, "\n========================================\n");
-        fprintf(pfTXT, "CARRERA ID: %d | CIRCUITO: %s\n", pc.id, pc.circuito);
-        fprintf(pfTXT, "========================================\n");
-        fprintf(pfTXT, "POS | ID PILOTO | PUNTOS\n");
-        fprintf(pfTXT, "----------------------------------------\n");
+    while(!feof(pfBin)){
+        if(pc.estado==1){
+            fprintf(pfTXT, "\n========================================\n");
+            fprintf(pfTXT, "CARRERA ID: %d | CIRCUITO: %s\n", pc.id, pc.circuito);
+            fprintf(pfTXT, "========================================\n");
+            fprintf(pfTXT, "POS | ID PILOTO | PUNTOS\n");
+            fprintf(pfTXT, "----------------------------------------\n");
+        }
         for(i=0; i < pc.cant_resultados; i++){
             fread(&res, sizeof(tResultado), 1, pfBin);
-            fprintf(pfTXT, "%-3d | %-9d | %d\n", res.posicion, res.id_piloto, res.total_puntos);
+            if(pc.estado==1)
+                fprintf(pfTXT, "%-3d | %-9d | %d\n", res.posicion, res.id_piloto, res.total_puntos);
         }
         fread(&pc, sizeof(tCarrera), 1, pfBin);
     }
     fclose(pfBin);
     fclose(pfTXT);
     return TODO_OK;
+}
+
+void menuABM(){
+    char opcion;
+    do{
+        system("cls");
+        opcion = menuBase(MENU_ABM, "0123");
+        switch(opcion){
+            case '1':
+                menuABMPilotos();
+                break;
+            case '2':
+                menuABMEscuderias();
+                break;
+            case '3':
+                menuABMCarreras();
+                break;
+            case '0':
+                break;
+        }
+    }while(opcion!=0);
+}
+
+void menuABMPilotos() {
+    char opcion;
+    do {
+        system("cls");
+        opcion = menuBase(MENU_ABM_PILOTOS, "0123");
+        switch(opcion) {
+            case '1':
+                break;
+            case '2':
+                break;
+            case '3':
+                break;
+            case '0':
+                break;
+        }
+    }while(opcion!='0');
+}
+
+void menuABMCarreras(){
+    char opcion;
+    do {
+        system("cls");
+        opcion = menuBase(MENU_ABM_CARRERAS, "0123");
+        switch(opcion){
+            case '1':
+                break;
+            case '2':
+                break;
+            case '3':
+                break;
+            case '0':
+                break;
+        }
+    }while(opcion!='0');
+}
+
+void menuABMEscuderias() {
+    char opcion;
+    do {
+        system("cls");
+        opcion = menuBase(MENU_ABM_ESCUDERIAS, "0123");
+        switch(opcion){
+            case '1':
+                break;
+            case '2':
+                break;
+            case '3':
+                break;
+            case '0':
+                break;
+        }
+    }while(opcion!='0');
 }
