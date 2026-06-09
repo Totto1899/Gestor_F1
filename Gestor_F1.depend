@@ -11,14 +11,16 @@
 	<string.h>
 	<time.h>
 
-1780344002 source:c:\users\pc\documents\github\gestor_f1\functions.c
+1781009237 source:c:\users\pc\documents\github\gestor_f1\functions.c
 	"library.h"
 
-1780350224 c:\users\pc\documents\github\gestor_f1\library.h
+1781009435 c:\users\pc\documents\github\gestor_f1\library.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	<time.h>
+	<ctype.h>
 
-1780346998 source:c:\users\pc\documents\github\gestor_f1\main.c
+1781009244 source:c:\users\pc\documents\github\gestor_f1\main.c
 	"library.h"
 

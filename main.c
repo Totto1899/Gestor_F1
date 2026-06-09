@@ -87,10 +87,19 @@ int main(){
                 menuExportarATXT();
                 break;
             case '7':
+<<<<<<< HEAD
                 menuABM();
                 break;
             case '8':
                 printf("\n ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
+=======
+                flag=funcionesABM(ARCH_PILOTO, ARCH_ESCUD, ARCH_CARRERA);
+                if(flag==ERR_AP)
+                    printf("\nNo se pudo abrir el puntero");
+                break;
+            case '8':
+                printf("\n\t ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
+>>>>>>> 855eb74070c08f4a9be46883ec3cabfa30e0d154
                 break;
         }
         if(op!='8'){
@@ -164,7 +173,7 @@ void mostrarPiloto(const void* v){
     printf("ID: %d | Nombre: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
 }
 
-int cmpPilotorPorId(const void* clave, const void* registro){
+int cmpPilotorPorId(const void* clave,const void* registro){
     int id_buscado = *(int*)clave;
     tPiloto* pil = (tPiloto*)registro;
     return id_buscado - pil->id;

@@ -22,16 +22,34 @@
 //MACROS DE MENU
 
 #define MENUBASE "\n\t---- GESTOR DE F1 ----\n" \
-                 "\tINGRESE LA OPCIÓN DESEADA:\n" \
+                 "\tINGRESE LA OPCIÃ“N DESEADA:\n" \
                  "\t1 - Listar pilotos\n" \
                  "\t2 - Registrar una carrera\n" \
                  "\t3 - Mostrar ranking de pilotos de la temporada\n" \
-                 "\t4 - Mostrar pilotos por escudería\n" \
-                 "\t5 - Calcular estadísticas de pilotos\n" \
+                 "\t4 - Mostrar pilotos por escuderÃ­a\n" \
+                 "\t5 - Calcular estadÃ­sticas de pilotos\n" \
                  "\t6 - Exportar datos a archivos de texto\n" \
+<<<<<<< HEAD
                  "\t7 - Dar de baja, alta o modificar\n" \
                  "\t8 - Finalizar programa\n" \
+=======
+                 "\t7 - ABM de archivos\n" \
+                 "\t8 - Finalizar programa\n"\
+>>>>>>> 855eb74070c08f4a9be46883ec3cabfa30e0d154
                  "\t--> "
+
+#define MENUABM "\n\t----INGRESE LA ACCIONES QUE QUIERE REALIZAR ----\n"\
+                "\t1 - Ingresar un registro\n"\
+                "\t2 - Dar de baja un registro\n"\
+                "\t3 - Modificar un registro\n"\
+                "\t4 - Volver para atras\n"\
+                "\t-->"
+
+#define MENUABMARCHIVOS "\n\t----INGRESE SOBRE QUE ARCHIVO ----\n"\
+                        "\t1 - Pilotos\n"\
+                        "\t2 - Escuderias\n"\
+                        "\t3 - Volver al menu\n"\
+                        "\t-->"
 
 #define MENU_EXPORTACION "\n=== MENU DE EXPORTACION A TXT ===\n" \
                          "1. Exportar Pilotos\n" \
@@ -39,7 +57,7 @@
                          "3. Exportar Carreras\n" \
                          "4. Exportar Bajas\n" \
                          "0. Volver al menu principal\n" \
-                         "Elija una opcion:"
+                         "Elija una opcion: "
 
 #define MENU_ESTADISTICAS "\n=== ESTADISTICAS DEL CAMPEONATO ===\n" \
                           "1. Top 5 pilotos con mas victorias\n" \
@@ -49,6 +67,7 @@
                           "0. Volver al menu principal\n" \
                           "Elija una opcion: "
 
+<<<<<<< HEAD
 #define MENU_ABM "\n=== GESTION DE ARCHIVOS (ABM) ===\n" \
                  "1. Gestionar Pilotos\n" \
                  "2. Gestionar Escuderias\n" \
@@ -77,12 +96,18 @@
                           "Ingrese una opcion: "
 
 #define OPCIONES_MENU "12345678"
+=======
+#define OPCIONES_MENU "12345678"
+#define OPCIONES_ABM "1234"
+#define OPCIONES_ABMARCH "123"
+>>>>>>> 855eb74070c08f4a9be46883ec3cabfa30e0d154
 
 //BIBLIOTECAS UTILIZADAS
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<time.h>
+#include<ctype.h>
 
 //TDAs
 typedef struct{
@@ -142,6 +167,14 @@ int contElementos(const char* nomArch, size_t tam);
 char menuBase(const char* msj, const char* opc);
 
 ///FUNCIONALIDADES MINIMAS
+int funcionesABM(const char* piloto, const char* escu, const char* carrera);
+void ingresarRegPiloto(FILE* pf);
+void ingresarRegEscuderia(FILE* pf);
+void ingresarRegCarrera(FILE* pf);
+void bajaRegPiloto(FILE* pf, size_t tam,const char* arc,int cmp(const void*, const void*));
+int cmpPilotorPorId(const void* clave, const void* registro);
+
+
 int listarPilotos(const char* nomArch, void mostrar(const void*));///1
 
 int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2

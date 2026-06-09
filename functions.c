@@ -307,7 +307,147 @@ char menuBase(const char* msj, const char* opc){
     return op;
 }
 
-///FUNCIONALIDADES MINIMAS
+        ///FUNCIONALIDADES MINIMAS
+
+int funcionesABM(const char* piloto, const char* escu, const char* carrera)
+{
+    char opAccion, opArchivo;
+
+
+    opAccion=menuBase(MENUABM,OPCIONES_ABM);
+    if(opAccion!='4')
+        opArchivo=menuBase(MENUABMARCHIVOS,OPCIONES_ABMARCH);
+
+    FILE* pf=fopen((opArchivo=='1'?piloto:(opArchivo=='2'?escu:carrera)),"r+b");
+
+    if(pf==NULL)
+        return ERR_AP;
+
+    switch(opAccion){
+        case '1':
+            (opArchivo=='1'?ingresarRegPiloto(pf):ingresarRegEscuderia(pf));
+            break;
+        case '2':
+            bajaRegPiloto(pf, sizeof(tPiloto),piloto,cmpPilotorPorId);
+            break;
+        case '3':
+            break;
+        case '4':
+            break;
+    }
+    fclose(pf);
+    return TODO_OK;
+}
+
+
+void bajaRegPiloto(FILE* pf, size_t tam, const char* arc,int cmp(const void*, const void*))
+{
+    void* aux;
+    char auxEstado;
+    unsigned int auxId;
+
+    printf("\n Ingrese la id del piloto que desea dar de baja: ");
+    scanf("%d", &auxId);
+
+    printf("\n Ingrese en que estado esta: ");
+    fflush(stdin);
+    scanf("%c", &auxEstado);
+
+    fread(aux,tam,1,pf);
+
+    while(!feof(pf))
+    {
+        if((cmp(auxId,aux))==0)
+        {
+            fseek(pf,-tam,SEEK_CUR);
+            cambio(auxEstado, aux);
+            fwrite(aux,tam,1,pf);
+        }
+        fseek(pf,0,1);
+        fread(aux, tam,1,pf);
+    }
+
+}
+
+void cambio(const void* clave, void* reg)
+{
+    char estado=*(char*)clave;
+    tPiloto* pil=(tPiloto*)reg;
+    pil->estado=estado;
+}
+
+void ingresarRegEscuderia(FILE* pf)
+{
+    unsigned int auxId;
+    tEscuderia aux;
+
+    fseek(pf,-sizeof(tEscuderia),SEEK_END);
+    fread(&aux,sizeof(tEscuderia),1,pf);
+    auxId=aux.id+1;
+
+    aux.id=auxId;
+    printf("\n\tIngrese el codigo de escuderia: ");
+    fflush(stdin);
+    gets(aux.codigo);
+
+    printf("\n\tIngrese el nombre de la escuderia: ");
+    fflush(stdin);
+    gets(aux.nombre);
+
+    printf("\n\tIngrese el pais de  la escuderia: ");
+    fflush(stdin);
+    gets(aux.pais);
+
+    do
+    {
+        printf("\n\tIngrese el codigo de escuderia (1-Activo 0-Inactivo): ");
+        scanf("%d", aux.estado);
+    }while(aux.estado!=1 && aux.estado!=0);
+
+    fseek(pf,0,SEEK_END);
+    fwrite(&aux,sizeof(tEscuderia),1,pf);
+}
+
+void ingresarRegPiloto(FILE* pf)
+{
+    unsigned int auxId;
+    tPiloto aux;
+
+    fseek(pf,-(sizeof(tPiloto)),SEEK_END);
+    fread(&aux,sizeof(tPiloto),1,pf);
+    auxId=(aux.id)+1;
+
+    aux.id=auxId;
+
+    printf("\n\tIngrese el nombre del piloto: ");
+    fflush(stdin);
+    gets(aux.nombre);
+
+    printf("\n\tIngrese la nacionalidad del piloto: ");
+    fflush(stdin);
+    gets(aux.nacionalidad);
+
+    printf("\n\tIngrese la escuderia del piloto: ");
+    scanf("%d", &aux.id_escuderia);
+
+    printf("\n\tIngrese los puntos acumulados del piloto: ");
+    scanf("%d", &aux.puntos_acumulados);
+
+    do
+    {
+        printf("\n\tIngrese el estado del piloto(A:Activo, R:Retirado, S:Suspendido): ");
+        fflush(stdin);
+        scanf("%c", &aux.estado);
+        toupper(aux.estado);
+    }while(aux.estado!='A'&&aux.estado!='R'&&aux.estado!='S');
+
+    printf("\n\tIngrese la fecha de nacimiento del piloto: ");
+    scanf("%llu", &aux.fechaNacimiento);
+
+    fseek(pf,0,SEEK_END);
+    fwrite(&aux,sizeof(tPiloto),1,pf);
+}
+
 
 int listarPilotos(const char* nomArch, void mostrar(const void*)){
     tPiloto p;
