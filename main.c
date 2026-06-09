@@ -10,6 +10,9 @@ int cmpPilotorPorId(const void* clave, const void* registro);
 int cmpPilotosPorPuntos(const void*, const void*);
 void mostrarPiloto(const void* v);
 
+///item 5
+void mostrarPilotoXEscu(const void* piloto, const void* escuderia);
+
 int main(){
     generarLoteEscuderiasTXT(CARGA_ESCUD);
     generarLotePilotosTXT(CARGA_PILOTO);
@@ -76,6 +79,7 @@ int main(){
                     printf("\nNo se pudo reservar memoria.");
                 break;
             case'4':
+                flag = mostrarPilotoXEscuderia(ARCH_PILOTO, ARCH_ESCUD, mostrarPilotoXEscu);
                 break;
             case '5':
                 break;
@@ -160,4 +164,10 @@ int cmpPilotorPorId(const void* clave, const void* registro){
     int id_buscado = *(int*)clave;
     tPiloto* pil = (tPiloto*)registro;
     return id_buscado - pil->id;
+}
+
+void mostrarPilotoXEscu(const void* piloto, const void* escuderia){
+    tPiloto* p = (tPiloto*)piloto;
+    tEscuderia* e = (tEscuderia*)escuderia;
+    printf("Escuderia: %-15s | Piloto: %-20s | Puntos: %03d\n", e->nombre, p->nombre, p->puntos_acumulados);
 }

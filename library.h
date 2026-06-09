@@ -100,11 +100,12 @@ int listarPilotos(const char* nomArch, void mostrar(const void*));///1
 int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
 int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos);///3
 int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));///4
+int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrarPiloto(const void*, const void*));///5
 void menuExportarATXT();///7
 int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const void*, FILE*)); ///7
-void grabarPilotoTXT(const void* registro, FILE* pfTXT);
-void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);
-int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);
+void grabarPilotoTXT(const void* registro, FILE* pfTXT);///7
+void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);///7
+int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);///7
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));

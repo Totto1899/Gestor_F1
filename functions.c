@@ -427,6 +427,33 @@ int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos){
         return ERR_BUSQUEDA;
 }
 
+int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrar(const void*, const void*)){
+    tPiloto p;
+    tEscuderia e;
+    FILE* pfPil = fopen(nomArchPil, "rb");
+    if(!pfPil)
+        return ERR_AP;
+    FILE* pfEscu = fopen(nomArchEscu, "rb");
+    if(!pfEscu){
+        fclose(pfPil);
+        return ERR_AP;
+    }
+    fread(&e, sizeof(tEscuderia), 1, pfEscu);
+    while(!feof(pfEscu)){
+        rewind(pfPil);
+        fread(&p, sizeof(tPiloto), 1, pfPil);
+        while(!feof(pfPil)){
+            if(p.id_escuderia==e.id)
+                mostrar(&p, &e);
+            fread(&p, sizeof(tPiloto), 1, pfPil);
+        }
+        fread(&e, sizeof(tEscuderia), 1, pfEscu);
+    }
+    fclose(pfPil);
+    fclose(pfEscu);
+    return TODO_OK;
+}
+
 void menuExportarATXT(){
     char opcion;
     int estado;
