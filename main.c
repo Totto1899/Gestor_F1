@@ -8,7 +8,7 @@ int cmpPilotorPorId(const void* clave, const void* registro);
 
 ///item 4
 int cmpPilotosPorPuntos(const void*, const void*);
-void mostrarPiloto(const void* v);
+void mostrarPiloto(const void* v); ///tambien usada para item 5
 
 int main(){
     generarLoteEscuderiasTXT(CARGA_ESCUD);
@@ -76,8 +76,12 @@ int main(){
                     printf("\nNo se pudo reservar memoria.");
                 break;
             case'4':
+                flag = mostrarPilotoXEscuderia(ARCH_PILOTO, ARCH_ESCUD, mostrarPiloto);
+                if(flag==ERR_AP)
+                    printf("\nNo se pudo abrir el archivo de carreras.dat o pilotos.dat");
                 break;
             case '5':
+                menuEstadisticas();
                 break;
             case '6':
                 menuExportarATXT();
@@ -88,16 +92,14 @@ int main(){
                     printf("\nNo se pudo abrir el puntero");
                 break;
             case '8':
-                break;
-            case '9':
                 printf("\n\t ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
                 break;
         }
-        if(op!='9'){
+        if(op!='8'){
             printf("\n");
             system("pause");
         }
-    }while(op!='9');
+    }while(op!='8');
     return 0;
 }
 
@@ -163,3 +165,8 @@ void mostrarPiloto(const void* v){
     printf("ID: %d | Nombre: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
 }
 
+int cmpPilotorPorId(const void* clave,const void* registro){
+    int id_buscado = *(int*)clave;
+    tPiloto* pil = (tPiloto*)registro;
+    return id_buscado - pil->id;
+}

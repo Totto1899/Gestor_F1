@@ -22,16 +22,15 @@
 //MACROS DE MENU
 
 #define MENUBASE "\n\t---- GESTOR DE F1 ----\n" \
-                 "\tINGRESE LA OPCI�N DESEADA:\n" \
-                 "\t1 - Listar pilotos y sus puntos\n" \
-                 "\t2 - Registrar una carrera (ingreso de posiciones)\n" \
-                 "\t3 - Calcular y actualizar puntos autom�ticamente\n" \
-                 "\t4 - Mostrar ranking de pilotos de la temporada\n" \
-                 "\t5 - Mostrar pilotos por escuder�a\n" \
-                 "\t6 - Calcular estad�sticas de pilotos\n" \
-                 "\t7 - ABM de archivos\n"\
-                 "\t8 - Exportar datos a archivos de texto\n" \
-                 "\t9 - Finalizar programa\n" \
+                 "\tINGRESE LA OPCIÓN DESEADA:\n" \
+                 "\t1 - Listar pilotos\n" \
+                 "\t2 - Registrar una carrera\n" \
+                 "\t3 - Mostrar ranking de pilotos de la temporada\n" \
+                 "\t4 - Mostrar pilotos por escudería\n" \
+                 "\t5 - Calcular estadísticas de pilotos\n" \
+                 "\t6 - Exportar datos a archivos de texto\n" \
+                 "\t7 - ABM de archivos\n" \
+                 "\t8 - Finalizar programa\n"\
                  "\t--> "
 
 #define MENUABM "\n\t----INGRESE LA ACCIONES QUE QUIERE REALIZAR ----\n"\
@@ -44,8 +43,7 @@
 #define MENUABMARCHIVOS "\n\t----INGRESE SOBRE QUE ARCHIVO ----\n"\
                         "\t1 - Pilotos\n"\
                         "\t2 - Escuderias\n"\
-                        "\t3 - Carreras\n"\
-                        "\t4 - Volver al menu\n"\
+                        "\t3 - Volver al menu\n"\
                         "\t-->"
 
 #define MENU_EXPORTACION "\n=== MENU DE EXPORTACION A TXT ===\n" \
@@ -55,8 +53,18 @@
                          "4. Exportar Bajas\n" \
                          "0. Volver al menu principal\n" \
                          "Elija una opcion: "
-#define OPCIONES_MENU "123456789"
+
+#define MENU_ESTADISTICAS "\n=== ESTADISTICAS DEL CAMPEONATO ===\n" \
+                          "1. Top 5 pilotos con mas victorias\n" \
+                          "2. Piloto con mejor promedio general\n" \
+                          "3. Piloto que alcanzo la mejor posicion\n" \
+                          "4. Piloto que obtuvo la peor posicion\n" \
+                          "0. Volver al menu principal\n" \
+                          "Elija una opcion: "
+
+#define OPCIONES_MENU "12345678"
 #define OPCIONES_ABM "1234"
+#define OPCIONES_ABMARCH "123"
 
 //BIBLIOTECAS UTILIZADAS
 #include<stdio.h>
@@ -66,6 +74,18 @@
 #include<ctype.h>
 
 //TDAs
+
+typedef struct{
+    int id_piloto;
+    char nombre[30];
+    int cant_carreras_corridas;
+    int victorias;
+    int mejor_posicion;
+    int peor_posicion;
+    int suma_posiciones;
+    float promedio_posicion; // suma_posiciones / cant_carreras_corridas
+}tEstadisticaPiloto;
+
 typedef struct{
     unsigned int id_piloto;
     unsigned int posicion;
@@ -122,14 +142,29 @@ int cmpPilotorPorId(const void* clave, const void* registro);
 
 
 int listarPilotos(const char* nomArch, void mostrar(const void*));///1
+
 int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
+
 int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos);///3
+
 int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));///4
+
+int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrarPiloto(const void*));///5
+
+int menuEstadisticas();///6
+tEstadisticaPiloto* generarEstadisticas(size_t* ce);///6
+int obtenerIndicePiloto(tEstadisticaPiloto* vec, size_t cant, int id_buscado);///6
+int cmpVictorias(const void* a, const void* b);
+void mostrarTop5(tEstadisticaPiloto* vec, size_t ce);
+void mostrarMejorPromedio(tEstadisticaPiloto* vec, size_t cant);
+void mostrarMejorPosicion(tEstadisticaPiloto* vec, size_t cant);
+void mostrarPeorPosicion(tEstadisticaPiloto* vec, size_t cant);
+
 void menuExportarATXT();///7
 int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, void grabar(const void*, FILE*)); ///7
-void grabarPilotoTXT(const void* registro, FILE* pfTXT);
-void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);
-int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);
+void grabarPilotoTXT(const void* registro, FILE* pfTXT);///7
+void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);///7
+int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);///7
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
