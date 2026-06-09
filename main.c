@@ -8,10 +8,7 @@ int cmpPilotorPorId(const void* clave, const void* registro);
 
 ///item 4
 int cmpPilotosPorPuntos(const void*, const void*);
-void mostrarPiloto(const void* v);
-
-///item 5
-void mostrarPilotoXEscu(const void* piloto, const void* escuderia);
+void mostrarPiloto(const void* v); ///tambien usada para item 5
 
 int main(){
     generarLoteEscuderiasTXT(CARGA_ESCUD);
@@ -79,9 +76,12 @@ int main(){
                     printf("\nNo se pudo reservar memoria.");
                 break;
             case'4':
-                flag = mostrarPilotoXEscuderia(ARCH_PILOTO, ARCH_ESCUD, mostrarPilotoXEscu);
+                flag = mostrarPilotoXEscuderia(ARCH_PILOTO, ARCH_ESCUD, mostrarPiloto);
+                if(flag==ERR_AP)
+                    printf("\nNo se pudo abrir el archivo de carreras.dat o pilotos.dat");
                 break;
             case '5':
+                menuEstadisticas();
                 break;
             case '6':
                 menuExportarATXT();
@@ -164,10 +164,4 @@ int cmpPilotorPorId(const void* clave, const void* registro){
     int id_buscado = *(int*)clave;
     tPiloto* pil = (tPiloto*)registro;
     return id_buscado - pil->id;
-}
-
-void mostrarPilotoXEscu(const void* piloto, const void* escuderia){
-    tPiloto* p = (tPiloto*)piloto;
-    tEscuderia* e = (tEscuderia*)escuderia;
-    printf("Escuderia: %-15s | Piloto: %-20s | Puntos: %03d\n", e->nombre, p->nombre, p->puntos_acumulados);
 }

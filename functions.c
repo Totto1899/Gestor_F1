@@ -427,7 +427,7 @@ int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos){
         return ERR_BUSQUEDA;
 }
 
-int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrar(const void*, const void*)){
+int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrar(const void*)){
     tPiloto p;
     tEscuderia e;
     FILE* pfPil = fopen(nomArchPil, "rb");
@@ -440,11 +440,14 @@ int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, voi
     }
     fread(&e, sizeof(tEscuderia), 1, pfEscu);
     while(!feof(pfEscu)){
+        printf("\n=== EQUIPO: %s ===\n", e.nombre);
         rewind(pfPil);
         fread(&p, sizeof(tPiloto), 1, pfPil);
         while(!feof(pfPil)){
-            if(p.id_escuderia==e.id)
-                mostrar(&p, &e);
+            if(p.id_escuderia==e.id){
+                printf("\t");
+                mostrar(&p);
+            }
             fread(&p, sizeof(tPiloto), 1, pfPil);
         }
         fread(&e, sizeof(tEscuderia), 1, pfEscu);
@@ -452,6 +455,180 @@ int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, voi
     fclose(pfPil);
     fclose(pfEscu);
     return TODO_OK;
+}
+
+int menuEstadisticas(){
+    char opcion;
+    size_t cant_pil;
+    tEstadisticaPiloto* vec_estadisticas;
+    vec_estadisticas = generarEstadisticas(&cant_pil);
+    if(!vec_estadisticas){
+        printf("\nNo se pudieron cargar las estadísticas.\n");
+        system("pause");
+        return ERR_MEM;
+    }
+    do{
+        system("cls");
+        opcion = menuBase(MENU_ESTADISTICAS, "01234");
+        switch(opcion){
+            case '1':
+                ssort(vec_estadisticas, cant_pil, sizeof(tEstadisticaPiloto), cmpVictorias);
+                mostrarTop5(vec_estadisticas, cant_pil);
+                break;
+            case '2':
+                mostrarMejorPromedio(vec_estadisticas, cant_pil);
+                break;
+            case '3':
+                mostrarMejorPosicion(vec_estadisticas, cant_pil);
+                break;
+            case '4':
+                mostrarPeorPosicion(vec_estadisticas, cant_pil);
+                break;
+            case '0':
+                break;
+        }
+    } while(opcion != '0');
+    free(vec_estadisticas);
+    return TODO_OK;
+}
+
+int cmpVictorias(const void* a, const void* b){
+    tEstadisticaPiloto* pA = (tEstadisticaPiloto*)a;
+    tEstadisticaPiloto* pB = (tEstadisticaPiloto*)b;
+    return pB->victorias - pA->victorias;
+}
+
+void mostrarTop5(tEstadisticaPiloto* vec, size_t ce){
+    int i;
+    tEstadisticaPiloto* pActual;
+    size_t limite = (ce<5)?ce:5;
+    printf("\n--- TOP 5 PILOTOS CON MAS VICTORIAS ---\n");
+    for(i=0; i<limite; i++){
+        pActual = vec+i;
+        printf("%d. ID Piloto: %-4d | Nombre: %-30s | Victorias: %d\n", i + 1, pActual->id_piloto, pActual->nombre, pActual->victorias);
+    }
+    system("pause");
+}
+
+void mostrarMejorPromedio(tEstadisticaPiloto* vec, size_t cant){
+    int i;
+    tEstadisticaPiloto* pMejorProm = vec;
+    tEstadisticaPiloto* pActual;
+    for(i=0; i<cant; i++){
+         pActual = vec+i;
+        if(pActual->promedio_posicion>0.0)
+            if(pMejorProm->promedio_posicion==0.0 || pActual->promedio_posicion<pMejorProm->promedio_posicion)
+                pMejorProm = pActual;
+    }
+    printf("\n---- MEJOR PROMEDIO GENERAL ----\n");
+    if(pMejorProm->promedio_posicion>0.0)
+            printf("ID Piloto: %d | Nombre: %-30s | Promedio de Posicion: %.2f\n", pMejorProm->id_piloto, pMejorProm->nombre, pMejorProm->promedio_posicion);
+    else
+        printf("Aun no se registraron carreras.\n");
+    system("pause");
+}
+
+void mostrarMejorPosicion(tEstadisticaPiloto* vec, size_t cant){
+    int i;
+    tEstadisticaPiloto* pMejorPos = vec;
+    tEstadisticaPiloto* pActual;
+    for(i=0; i<cant; i++){
+        pActual = vec+i;
+        if(pActual->mejor_posicion>0)
+            if(pMejorPos->mejor_posicion==0 || pActual->mejor_posicion<pMejorPos->mejor_posicion)
+                pMejorPos = pActual;
+    }
+    printf("\n---- MEJOR POSICION ALCANZADA ----\n");
+    if(pMejorPos->mejor_posicion>0)
+        printf("ID Piloto: %d | Nombre: %-30s | Posicion: %d\n", pMejorPos->id_piloto, pMejorPos->nombre, pMejorPos->mejor_posicion);
+    else
+        printf("No hay registros.\n");
+    system("pause");
+}
+
+void mostrarPeorPosicion(tEstadisticaPiloto* vec, size_t cant){
+    int i;
+    tEstadisticaPiloto* pPeorPos = vec;
+    tEstadisticaPiloto* pActual;
+    for(i = 1; i < cant; i++){
+        pActual = vec+i;
+        if(pActual->peor_posicion>pPeorPos->peor_posicion)
+            pPeorPos = pActual;
+    }
+    printf("\n---- PEOR POSICION ALCANZADA ----\n");
+    if(pPeorPos->peor_posicion>0)
+        printf("ID Piloto: %d | Nombre: %-30s | Posicion: %d\n", pPeorPos->id_piloto, pPeorPos->nombre, pPeorPos->peor_posicion);
+    else
+        printf("No hay registros.\n");
+
+    system("pause");
+}
+
+tEstadisticaPiloto* generarEstadisticas(size_t* ce){
+    FILE* pfCar;
+    tCarrera car;
+    tResultado res;
+    tPiloto p;
+    int i = 0, pos;
+    *ce = contElementos(ARCH_PILOTO, sizeof(tPiloto));
+    if(*ce==0)
+        return NULL;
+    tEstadisticaPiloto* vec = (tEstadisticaPiloto*)calloc(*ce, sizeof(tEstadisticaPiloto));
+    if(!vec)
+        return NULL;
+    FILE* pfPil = fopen(ARCH_PILOTO, "rb");
+    if(!pfPil){
+        free(vec);
+        return NULL;
+    }
+    fread(&p, sizeof(tPiloto), 1, pfPil);
+    while(!feof(pfPil)){
+        (vec+i)->id_piloto = p.id;
+        strcpy((vec+i)->nombre, p.nombre);
+        (vec+i)->mejor_posicion = 999;
+        i++;
+        fread(&p, sizeof(tPiloto), 1, pfPil);
+    }
+    fclose(pfPil);
+
+    pfCar = fopen(ARCH_CARRERA, "rb");
+    if(!pfCar)
+        return NULL;
+    fread(&car, sizeof(tCarrera), 1, pfCar);
+    while(!feof(pfCar)){
+        for(i=0; i<car.cant_resultados; i++){
+            fread(&res, sizeof(tResultado), 1, pfCar);
+            pos = obtenerIndicePiloto(vec, *ce, res.id_piloto);
+            if(pos!= -1){
+                (vec+pos)->cant_carreras_corridas++;
+                (vec+pos)->suma_posiciones += res.posicion;
+                if(res.posicion==1)
+                    (vec+pos)->victorias++;
+                if(res.posicion < (vec+pos)->mejor_posicion)
+                    (vec+pos)->mejor_posicion = res.posicion;
+                if(res.posicion > (vec+pos)->peor_posicion)
+                    (vec+pos)->peor_posicion = res.posicion;
+            }
+        }
+    }
+    for(i=0; i<*ce; i++){
+        if((vec+i)->cant_carreras_corridas>0)
+            (vec+i)->promedio_posicion = (float)(vec+i)->suma_posiciones/(vec+i)->cant_carreras_corridas;
+        else{
+            (vec+i)->promedio_posicion = 0.0;
+            (vec+i)->mejor_posicion = 0;
+        }
+    }
+    return vec;
+}
+
+int obtenerIndicePiloto(tEstadisticaPiloto* vec, size_t cant, int id_buscado){
+    int i;
+    for(i=0; i<cant; i++){
+        if((vec+i)->id_piloto==id_buscado)
+            return i;
+    }
+    return -1;
 }
 
 void menuExportarATXT(){
