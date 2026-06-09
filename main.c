@@ -87,14 +87,17 @@ int main(){
                 menuExportarATXT();
                 break;
             case '7':
+                menuABM();
+                break;
+            case '8':
                 printf("\n ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
                 break;
         }
-        if(op!='7'){
+        if(op!='8'){
             printf("\n");
             system("pause");
         }
-    }while(op!='7');
+    }while(op!='8');
     return 0;
 }
 
@@ -133,6 +136,7 @@ int trozarEscuderia(void* vec, size_t tam, const char* linea){
     char* aux;
     strcpy(linea_copia, linea);
     aux = strchr(linea_copia, '\n');
+    *aux = '\0';
     aux = strrchr(linea_copia, '|');
     *aux = '\0';
     sscanf(aux + 1, "%d", &e->estado);
