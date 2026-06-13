@@ -10,6 +10,7 @@
 #define ERR_MEM -3
 #define ERR_BUSQUEDA -4
 #define ERR_ACT -5
+#define ERR 0
 
 //MACROS DE ARCHIVOS
 #define CARGA_PILOTO "pilotos.txt"
@@ -30,7 +31,9 @@
                  "\t5 - Calcular estadísticas de pilotos\n" \
                  "\t6 - Exportar datos a archivos de texto\n" \
                  "\t7 - Dar de baja, alta o modificar\n" \
-                 "\t8 - Finalizar programa\n" \
+                 "\t8 - Simular una carrera\n" \
+                 "\t9 - Combinar temporadas\n" \
+                 "\t0 - Finalizar programa\n" \
                  "\t--> "
 
 #define MENUABM "\n\t----INGRESE LA ACCIONES QUE QUIERE REALIZAR ----\n"\
@@ -108,8 +111,7 @@
                           "0. Volver al Menu Anterior\n\n" \
                           "Ingrese una opcion: "
 
-#define OPCIONES_MENU "12345678"
-#define OPCIONES_MENU "12345678"
+#define OPCIONES_MENU "0123456789"
 #define OPCIONES_ABM "1234"
 #define OPCIONES_ABMARCH "123"
 #define OPCIONES_MENUMODIPILOTO "1234567"
@@ -127,6 +129,7 @@
 typedef struct{
     int id_piloto;
     char nombre[30];
+    int puntos_acumulados;
     int cant_carreras_corridas;
     int victorias;
     int mejor_posicion;
@@ -168,9 +171,6 @@ typedef struct{
     tResultado* matriz;
 }tCarrera;
 
-
-///FUNCIONES
-
 ///FUNCIONES GENERALES
 int generarLoteEscuderiasTXT(const char* nomArch);
 int generarLotePilotosTXT(const char* nomArch);
@@ -180,10 +180,6 @@ void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 int contElementos(const char* nomArch, size_t tam);
 
-///MENUS
-char menuBase(const char* msj, const char* opc);
-
-///FUNCIONALIDADES MINIMAS
 int funcionesABM(const char* piloto, const char* escu, const char* carrera);
 void ingresarRegPiloto(FILE* pf, size_t tam);
 void ingresarRegEscuderia(FILE* pf, size_t tam);
@@ -196,8 +192,10 @@ tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam);
 void modifiEscuderia(FILE* pf, const char* arc, size_t tam);
 void modifiPiloto(FILE* pf, const char* arc, size_t tam);
 
+///MENUS
+char menuBase(const char* msj, const char* opc);
 
-
+///FUNCIONALIDADES MINIMAS
 int listarPilotos(const char* nomArch, void mostrar(const void*));///1
 
 int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
@@ -206,7 +204,7 @@ int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos);//
 
 int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));///4
 
-int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrarPiloto(const void*));///5
+int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrar(const void*));///5
 
 ///6
 int menuEstadisticas();
@@ -225,11 +223,16 @@ void grabarPilotoTXT(const void* registro, FILE* pfTXT);
 void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);
 int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);
 
-///AMB
-void menuABM();
-void menuABMPilotos();
-void menuABMEscuderias();
-void menuABMCarreras();
+///PUNTOS ADICIONALES
+
+///SIMULACIÓN DE CARRERA
+int simularCarrera(const char* nomArchPil, const char* nomArchCar);
+size_t contPilActivos(FILE* pf);
+int validarIdCar(const char* nomArchCar);
+int buscarCarreraId(const char* nomArchCar, int id_buscado);
+int* asignarPosiciones(FILE* pf_pil, size_t cant_pil_act);
+void asignarPuntos(tCarrera* c, int* vec_pos);
+void mostrarResultados(tCarrera* car);
 
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
@@ -239,12 +242,5 @@ int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
 void mswap(void* a, void* b, size_t tam);
 void* buscar_menor(const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
-
-///PROCESAMIENTO
-void* mmap(void* vec, size_t ce, size_t tam, void action(void*));
-int filter(void* vec, size_t ce, size_t tam, int fred(const void*, size_t* ce));
-void reduce(void* vec, size_t ce, size_t tam, void* d, int fred(void*, const void*));
-void* mi_memcpy(void* destino, const void* origen, size_t n);
-void* mi_memmove(void* destino, const void* origen, size_t n);
 
 #endif // LIBRARY_H_INCLUDED
