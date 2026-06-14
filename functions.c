@@ -971,12 +971,13 @@ int simularCarrera(const char* nomArchPil, const char* nomArchCar){
         return ERR_MEM;
     }
 
-    car.id = validarIdCar(nomArchCar);
+    car.id = obtenerSiguienteIdCarrera(nomArchCar); //el usuario no lo puede ingresar, es para mantenerlo ordenado.
+    printf("\nID de carrera generado automaticamente: %d\n", car.id);
+
     car.cant_resultados = cant_pil_act;
     car.fecha = time(NULL);
     car.estado = 1;
     printf("\nIngrese el nombre del circuito: ");
-    while(getchar() != '\n');
     fgets(car.circuito, sizeof(car.circuito), stdin);
     car.circuito[strcspn(car.circuito, "\n")] = 0;
 
@@ -1045,15 +1046,18 @@ int* asignarPosiciones(FILE* pf_pil, size_t cant_pil_act){
     return vec_pos;
 }
 
-int validarIdCar(const char* nomArchCar){
-    int id_car;
-    do{
-        printf("\nIngrese el id de la carrera: ");
-        scanf("%d", &id_car);
-        if(buscarCarreraId(nomArchCar, id_car)==1)
-            printf("\nEl id de carrera ingresado ya existe. Intente nuevamente.");
-    }while(buscarCarreraId(nomArchCar, id_car)==1);
-    return id_car;
+int obtenerSiguienteIdCarrera(const char* nomArch){
+    FILE* pf = fopen(nomArch, "rb");
+    tCarrera car = {0};
+    int ultimo_id = 0;
+    if(pf){
+        while(leerCarreraCompleta(pf, &car)==1){
+            ultimo_id = car.id;
+            free(car.matriz);
+        }
+        fclose(pf);
+    }
+    return ultimo_id+1;
 }
 
 int buscarCarreraId(const char* nomArchCar, int id_buscado){
@@ -1097,4 +1101,90 @@ void mostrarResultados(tCarrera* car){
     for(i=0; i<car->cant_resultados; i++)
         printf(" %3d | %9d | %6d \n", (res+i)->posicion, (res+i)->id_piloto, (res+i)->total_puntos);
     printf("==========================\n");
+}
+
+///
+
+int combinarCarreras(const char* temp1, const char* temp2, const char* resultado){
+    FILE *pf1, *pf2, *pfResultado;
+    tCarrera car1 = {0}, car2 = {0};
+    int lec1, lec2;
+
+    pf1 = fopen(temp1, "rb");
+    if(!pf1)
+        return ERR_AP;
+    pf2 = fopen(temp2, "rb");
+    if (!pf2) {
+        fclose(pf1);
+        return ERR_AP;
+    }
+    pfResultado = fopen(resultado, "wb");
+    if (!pfResultado){
+        fclose(pf1);
+        fclose(pf2);
+        return ERR_AP;
+    }
+
+    lec1 = leerCarreraCompleta(pf1, &car1);
+    lec2 = leerCarreraCompleta(pf2, &car2);
+    while(lec1==1 && lec2==1){
+        if(car1.id < car2.id){
+            escribirCarreraCompleta(pfResultado, &car1);
+            free(car1.matriz);
+            lec1 = leerCarreraCompleta(pf1, &car1);
+        }
+        else if(car1.id > car2.id){
+            escribirCarreraCompleta(pfResultado, &car2);
+            free(car2.matriz);
+            lec2 = leerCarreraCompleta(pf2, &car2);
+        }
+        else{ //duplicado
+            escribirCarreraCompleta(pfResultado, &car1);
+            free(car1.matriz);
+            free(car2.matriz);
+            lec1 = leerCarreraCompleta(pf1, &car1);
+            lec2 = leerCarreraCompleta(pf2, &car2);
+        }
+    }
+    while(lec1==1){
+        escribirCarreraCompleta(pfResultado, &car1);
+        free(car1.matriz);
+        lec1 = leerCarreraCompleta(pf1, &car1);
+    }
+    while(lec2==1){
+        escribirCarreraCompleta(pfResultado, &car2);
+        free(car2.matriz);
+        lec2 = leerCarreraCompleta(pf2, &car2);
+    }
+
+    fclose(pf1);
+    fclose(pf2);
+    fclose(pfResultado);
+    return TODO_OK;
+}
+
+void ingresarNomCarrera(char* nomArch){
+    system("cls");
+    printf("\nIngrese el nombre del archivo de la temporada: ");
+    scanf("%19s", nomArch);
+}
+
+int leerCarreraCompleta(FILE* pf, tCarrera* car){
+    if(fread(car, sizeof(tCarrera), 1, pf)==1){
+        car->matriz = malloc(car->cant_resultados*sizeof(tResultado));
+        if(!car->matriz)
+            return 0;
+        fread(car->matriz, sizeof(tResultado), car->cant_resultados, pf);
+        return 1;
+    }
+    else
+        return 0;
+}
+
+int escribirCarreraCompleta(FILE* pf, tCarrera* car){
+    if(fwrite(car, sizeof(tCarrera), 1, pf)!=1)
+        return 0;
+    if(fwrite(car->matriz, sizeof(tResultado), car->cant_resultados, pf)!=car->cant_resultados)
+        return 0;
+    return TODO_OK;
 }

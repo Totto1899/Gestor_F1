@@ -18,6 +18,7 @@
 #define ARCH_PILOTO "pilotos.dat"
 #define ARCH_ESCUD "escuderias.dat"
 #define ARCH_CARRERA "carreras.dat"
+#define ARCH_CARRERA2 "carreras2.dat"
 #define ARCH_BAJAS "bajas.dat"
 
 //MACROS DE MENU
@@ -228,14 +229,19 @@ int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);
 ///SIMULACIÓN DE CARRERA
 int simularCarrera(const char* nomArchPil, const char* nomArchCar);
 size_t contPilActivos(FILE* pf);
-int validarIdCar(const char* nomArchCar);
 int buscarCarreraId(const char* nomArchCar, int id_buscado);
 int* asignarPosiciones(FILE* pf_pil, size_t cant_pil_act);
 void asignarPuntos(tCarrera* c, int* vec_pos);
 void mostrarResultados(tCarrera* car);
+int obtenerSiguienteIdCarrera(const char* nomArch);
+
+///COMBINACION DE TEMPORADAS
+int combinarCarreras(const char* temp1, const char* temp2, const char* resultado);
+void ingresarNomCarrera(char* nomArch);
+int leerCarreraCompleta(FILE* pf, tCarrera* car);
+int escribirCarreraCompleta(FILE* pf, tCarrera* car);
 
 ///BUSQUEDA
-void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
 int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_t tam, int cmp(const void*, const void*));
 
 ///ORDENAMIENTO
