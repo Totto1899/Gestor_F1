@@ -47,8 +47,17 @@ int main(){
     generarLoteArchivoCarrera(ARCH_CARRERA, ARCH_PILOTO);
 
     printf("--- MIGRACION FINALIZADA ---\n");
+
+    FILE* pf = fopen(ARCH_CARRERA2, "wb");
+    if (pf){
+        fclose(pf);
+        printf("[OK] El archivo de carreras fue destruido y vaciado a 0 bytes.\n");
+        system("pause");
+    }
     */
-    int flag;
+
+    srand(time(NULL));
+    int flag, random;
     char op = 0;
 
     do{
@@ -93,9 +102,24 @@ int main(){
                     printf("\nNo se pudo abrir algun archivo .dat");
                 break;
             case '8':
-                flag = simularCarrera(ARCH_PILOTO, ARCH_CARRERA);
+                random = rand()%2;
+                flag = simularCarrera(ARCH_PILOTO, (random==0) ? ARCH_CARRERA : ARCH_CARRERA2);
+                if(flag==ERR_AP)
+                    printf("\nNo se pudo abrir el archivo de carreras.dat!");
+                else if(flag==ERR_MEM)
+                    printf("\nNo se pudo reservar memoria!");
                 break;
             case '9':
+                char temp1[20] = ARCH_CARRERA;
+                char temp2[20] = ARCH_CARRERA2;
+                char resultado[20] = "combinado.dat";
+                //ingresarNomCarrera(temp1);
+                //ingresarNomCarrera(temp2);
+                flag = combinarCarreras(temp1, temp2, resultado);
+                if(flag==ERR_AP)
+                    printf("No se pudieron abrir los archivos de origen.\n");
+                else if(flag==TODO_OK)
+                    printf("Temporadas combinadas con exito en %s!\n", resultado);
                 break;
             case '0':
                 printf("\n\t ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");

@@ -2,6 +2,7 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
+<<<<<<< HEAD
 	<File name="functions.c" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="28151" topLine="902" />
@@ -10,11 +11,38 @@
 	<File name="library.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="294" topLine="0" />
+=======
+	<File name="library.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+		<Cursor>
+<<<<<<< HEAD
+			<Cursor1 position="517" topLine="9" />
+=======
+			<Cursor1 position="4378" topLine="174" />
+>>>>>>> 818552aa779f80518c14cb45779bd7938c65a063
 		</Cursor>
 	</File>
 	<File name="main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
 		<Cursor>
+<<<<<<< HEAD
 			<Cursor1 position="4511" topLine="95" />
+=======
+			<Cursor1 position="3422" topLine="157" />
+>>>>>>> c8558bb75f0004eef55e79069b715f084a58c52b
+		</Cursor>
+	</File>
+	<File name="functions.c" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+<<<<<<< HEAD
+			<Cursor1 position="4465" topLine="102" />
+		</Cursor>
+	</File>
+	<File name="functions.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="30302" topLine="1107" />
+=======
+			<Cursor1 position="8243" topLine="254" />
+>>>>>>> c8558bb75f0004eef55e79069b715f084a58c52b
+>>>>>>> 818552aa779f80518c14cb45779bd7938c65a063
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

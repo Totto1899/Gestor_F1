@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1781392652 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\functions.c
+1781458253 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\functions.c
 	"library.h"
 
-1781391673 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\main.c
+1781458509 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\main.c
 	"library.h"
 
-1781387194 c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\library.h
+1781457299 c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\library.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
