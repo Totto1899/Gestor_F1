@@ -11,6 +11,7 @@
 #define ERR_BUSQUEDA -4
 #define ERR_ACT -5
 #define ERR 0
+#define ERR_NOTARC -6
 
 //MACROS DE ARCHIVOS
 #define CARGA_PILOTO "pilotos.txt"
@@ -18,7 +19,6 @@
 #define ARCH_PILOTO "pilotos.dat"
 #define ARCH_ESCUD "escuderias.dat"
 #define ARCH_CARRERA "carreras.dat"
-#define ARCH_BAJAS "bajas.dat"
 #define ARCH_PILOTOBAJAS "pilotos_bajas.dat"
 #define ARCH_ESCUDBAJAS "escuderias_bajas.dat"
 
@@ -74,7 +74,8 @@
                          "1. Exportar Pilotos\n" \
                          "2. Exportar Escuderias\n" \
                          "3. Exportar Carreras\n" \
-                         "4. Exportar Bajas\n" \
+                         "4. Exportar Bajas de Pilotos\n" \
+                         "5. Exportar Bajas de Escuderias\n" \
                          "0. Volver al menu principal\n" \
                          "Elija una opcion: "
 

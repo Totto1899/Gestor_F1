@@ -113,15 +113,19 @@ int trozarPilotos(void* vec, size_t tam, const char* linea){
     tPiloto* p = (tPiloto*)vec;
     char linea_copia[MAX_LINEA];
     char* aux;
+
     strcpy(linea_copia, linea);
     aux = strchr(linea_copia, '\n');
     *aux = '\0';
+
     aux = strrchr(linea_copia, '|');
     *aux = '\0';
     sscanf(aux+1, "%llu", &p->fechaNacimiento);
+
     aux = strrchr(linea_copia, '|');
     *aux = '\0';
     sscanf(aux+1, "%c", &p->estado);
+
     aux = strrchr(linea_copia, '|');
     *aux = '\0';
     sscanf(aux+1, "%u", &p->puntos_acumulados);

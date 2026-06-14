@@ -443,7 +443,7 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam)
             break;
         case '6':
             valor= malloc(sizeof(unsigned));
-            scanf("%d", &valor);
+            scanf("%u", &valor);
             aux.puntos_acumulados=(unsigned)valor;
             break;
         case '7':
@@ -876,7 +876,7 @@ void menuExportarATXT(){
     int estado;
     do{
         system("cls");
-        opcion = menuBase(MENU_EXPORTACION, "01234");
+        opcion = menuBase(MENU_EXPORTACION, "012345");
         switch(opcion) {
             case '1':
                 estado = exportarATXT(ARCH_PILOTO, "pilotos.txt", sizeof(tPiloto), grabarPilotoTXT);
@@ -903,11 +903,22 @@ void menuExportarATXT(){
                 system("pause");
                 break;
             case '4':
-                estado = exportarATXT(ARCH_BAJAS, "bajas.txt", sizeof(tPiloto), grabarPilotoTXT);
+                estado = exportarATXT(ARCH_PILOTOBAJAS, "pilotos_bajas.txt", sizeof(tPiloto), grabarPilotoTXT);
                 if(estado == TODO_OK)
                     printf("Bajas exportadas con exito!\n");
+                if(estado == ERR_NOTARC)
+                    printf("El archivo que quiere exportar no exixste...\n");
                 else
                     printf("Error al exportar bajas.\n");
+                system("pause");
+                break;
+            case '5':
+                estado = exportarATXT(ARCH_ESCUDBAJAS, "escuderias_bajas.txt", sizeof(tEscuderia), grabarEscuderiaTXT);
+                if(estado == TODO_OK)
+                    printf("Bajas exportadas con exito!\n");
+
+                if(estado == ERR_NOTARC)
+                    printf("El archivo que quiere exportar no exixste...\n");
                 system("pause");
                 break;
         }
@@ -918,7 +929,7 @@ int exportarATXT(const char* nomArchBin, const char* nomArchTXT, size_t tam, voi
     void* dato;
     FILE* pfBin = fopen(nomArchBin, "rb");
     if(!pfBin)
-        return ERR_AP;
+        return ERR_NOTARC;
     FILE* pfTXT = fopen(nomArchTXT, "wt");
     if(!pfTXT){
         fclose(pfBin);
