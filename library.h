@@ -20,6 +20,8 @@
 #define ARCH_CARRERA "carreras.dat"
 #define ARCH_CARRERA2 "carreras2.dat"
 #define ARCH_BAJAS "bajas.dat"
+#define ARCH_PILOTOBAJAS "pilotos_bajas.dat"
+#define ARCH_ESCUDBAJAS "escuderias_bajas.dat"
 
 //MACROS DE MENU
 
@@ -85,32 +87,6 @@
                           "0. Volver al menu principal\n" \
                           "Elija una opcion: "
 
-#define MENU_ABM "\n=== GESTION DE ARCHIVOS (ABM) ===\n" \
-                 "1. Gestionar Pilotos\n" \
-                 "2. Gestionar Escuderias\n" \
-                 "3. Gestionar Carreras\n" \
-                 "0. Volver al Menu Principal\n\n" \
-                 "Ingrese una opcion: "
-
-#define MENU_ABM_PILOTOS "\n--- ABM PILOTOS ---\n" \
-                         "1. Alta de Piloto\n" \
-                         "2. Baja Logica de Piloto\n" \
-                         "3. Modificar Piloto\n" \
-                         "0. Volver al Menu Anterior\n\n" \
-                         "Ingrese una opcion: "
-
-#define MENU_ABM_ESCUDERIAS "\n--- ABM ESCUDERIAS ---\n" \
-                            "1. Alta de Escuderia\n" \
-                            "2. Baja Logica de Escuderia\n" \
-                            "3. Modificar Escuderia\n" \
-                            "0. Volver al Menu Anterior\n\n" \
-                            "Ingrese una opcion: "
-#define MENU_ABM_CARRERAS "\n--- ABM CARRERAS ---\n" \
-                          "1. Alta de Carrera (Ingresar resultados)\n" \
-                          "2. Baja Logica de Carrera (Invalidar)\n" \
-                          "3. Modificar Carrera\n" \
-                          "0. Volver al Menu Anterior\n\n" \
-                          "Ingrese una opcion: "
 
 #define OPCIONES_MENU "0123456789"
 #define OPCIONES_ABM "1234"
@@ -172,6 +148,7 @@ typedef struct{
     tResultado* matriz;
 }tCarrera;
 
+
 ///FUNCIONES GENERALES
 int generarLoteEscuderiasTXT(const char* nomArch);
 int generarLotePilotosTXT(const char* nomArch);
@@ -181,15 +158,12 @@ void* cargaInicial(const char* nomArch, void* vec, size_t tam, int* capacidad,
 int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 int contElementos(const char* nomArch, size_t tam);
 
+///FUNCIONES DE ABM
 int funcionesABM(const char* piloto, const char* escu, const char* carrera);
 void ingresarRegPiloto(FILE* pf, size_t tam);
 void ingresarRegEscuderia(FILE* pf, size_t tam);
-void ingresarRegCarrera(FILE* pf);
-void bajaRegPiloto(FILE* pf, size_t tam,const char* arc,int cmp(const void*, const void*));
-int cmpPilotorPorId(const void* clave, const void* registro);
-
-tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam);
-tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam);
+int bajaRegPiloto(FILE* pf, size_t tam, const char* arc);
+int bajaRegEscuderia(FILE* pf, size_t tam,const char* arc);
 void modifiEscuderia(FILE* pf, const char* arc, size_t tam);
 void modifiPiloto(FILE* pf, const char* arc, size_t tam);
 
@@ -243,6 +217,8 @@ int escribirCarreraCompleta(FILE* pf, tCarrera* car);
 
 ///BUSQUEDA
 int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_t tam, int cmp(const void*, const void*));
+tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam);
+tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam);
 
 ///ORDENAMIENTO
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
