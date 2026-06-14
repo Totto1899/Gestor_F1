@@ -81,32 +81,6 @@
                           "0. Volver al menu principal\n" \
                           "Elija una opcion: "
 
-#define MENU_ABM "\n=== GESTION DE ARCHIVOS (ABM) ===\n" \
-                 "1. Gestionar Pilotos\n" \
-                 "2. Gestionar Escuderias\n" \
-                 "3. Gestionar Carreras\n" \
-                 "0. Volver al Menu Principal\n\n" \
-                 "Ingrese una opcion: "
-
-#define MENU_ABM_PILOTOS "\n--- ABM PILOTOS ---\n" \
-                         "1. Alta de Piloto\n" \
-                         "2. Baja Logica de Piloto\n" \
-                         "3. Modificar Piloto\n" \
-                         "0. Volver al Menu Anterior\n\n" \
-                         "Ingrese una opcion: "
-
-#define MENU_ABM_ESCUDERIAS "\n--- ABM ESCUDERIAS ---\n" \
-                            "1. Alta de Escuderia\n" \
-                            "2. Baja Logica de Escuderia\n" \
-                            "3. Modificar Escuderia\n" \
-                            "0. Volver al Menu Anterior\n\n" \
-                            "Ingrese una opcion: "
-#define MENU_ABM_CARRERAS "\n--- ABM CARRERAS ---\n" \
-                          "1. Alta de Carrera (Ingresar resultados)\n" \
-                          "2. Baja Logica de Carrera (Invalidar)\n" \
-                          "3. Modificar Carrera\n" \
-                          "0. Volver al Menu Anterior\n\n" \
-                          "Ingrese una opcion: "
 
 #define OPCIONES_MENU "12345678"
 #define OPCIONES_MENU "12345678"
@@ -187,12 +161,8 @@ char menuBase(const char* msj, const char* opc);
 int funcionesABM(const char* piloto, const char* escu, const char* carrera);
 void ingresarRegPiloto(FILE* pf, size_t tam);
 void ingresarRegEscuderia(FILE* pf, size_t tam);
-void ingresarRegCarrera(FILE* pf);
 void bajaRegPiloto(FILE* pf, size_t tam,const char* arc,int cmp(const void*, const void*));
-int cmpPilotorPorId(const void* clave, const void* registro);
 
-tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam);
-tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam);
 void modifiEscuderia(FILE* pf, const char* arc, size_t tam);
 void modifiPiloto(FILE* pf, const char* arc, size_t tam);
 
@@ -225,15 +195,11 @@ void grabarPilotoTXT(const void* registro, FILE* pfTXT);
 void grabarEscuderiaTXT(const void* registro, FILE* pfTXT);
 int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT);
 
-///AMB
-void menuABM();
-void menuABMPilotos();
-void menuABMEscuderias();
-void menuABMCarreras();
-
 ///BUSQUEDA
 void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
 int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_t tam, int cmp(const void*, const void*));
+tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam);
+tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam);
 
 ///ORDENAMIENTO
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));
