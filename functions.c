@@ -109,7 +109,7 @@ int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
         free(vecPil);
         return ERR_AP;
     }
-    tCarrera car_aux;
+    tCarrera car_aux = {0};
     car_aux.id = 1;
     strcpy(car_aux.circuito, "Monza");
     car_aux.fecha = (unsigned long long)time(NULL);
@@ -135,7 +135,7 @@ int generarLoteArchivoCarrera(const char* nomArchCar, const char* nomArchPil){
     }
 
     fwrite(&car_aux, sizeof(tCarrera), 1, pfCar);
-    fwrite(car_aux.matriz, sizeof(tResultado), ce_pil, pfCar);
+    fwrite(car_aux.matriz, sizeof(tResultado), cant_activos, pfCar);
     free(vecPil);
     free(car_aux.matriz);
     fclose(pfCar);
@@ -177,28 +177,6 @@ void* buscar_menor(const void* vec, size_t ce, size_t tam, int cmp(const void*, 
     return men;
 }
 
-void* mbsearch(const void* clave, const void* vec, size_t ce, size_t tam,
-               int cmp(const void*, const void*)){
-
-    size_t elem_izq;
-    void* pm;
-    int res;
-    while(ce > 0){
-        elem_izq = ce / 2;
-        pm = (void*)vec + (elem_izq*tam);
-        res = cmp(clave, pm);
-        if(res==0)
-            return pm;
-        else if(res > 0){
-            vec = pm + tam;
-            ce = ce - elem_izq - 1;
-        }
-        else
-            ce = elem_izq;
-    }
-    return NULL;
-}
-
 int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_t tam, int cmp(const void*, const void*)){
     int encontrado = 0;
     FILE* pf = fopen(nomArch, "rb");
@@ -212,80 +190,6 @@ int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_
             fread(destino, tam, 1, pf);
     fclose(pf);
     return encontrado;
-}
-
-void* mmap(void* vec, size_t ce, size_t tam, void action(void*)){
-    void* r = vec;
-    int i;
-    for(i=0; i<ce ; i++){
-        action(vec);
-        vec+=tam;
-    }
-    return r;
-}
-
-int filter(void* vec, size_t ce, size_t tam, int ffilter(const void*, size_t* ce)){
-    void* end = vec+(ce*tam);
-    void* pr = vec;
-    void* pw = vec;
-    int cant_filtrada = 0;
-    while(pr<end){
-        if(ffilter(pr, &ce)){
-            if(pr!=pw)
-                memmove(pw, pr, tam);
-            pw += tam;
-        }
-        else
-            cant_filtrada++;
-        pr += tam;
-    }
-    return cant_filtrada;
-}
-
-void reduce(void* vec, size_t ce, size_t tam, void* d, int fred(void*, const void*)){
-    int i;
-    for(i=0; i<ce ; i++){
-        fred(d, vec);
-        vec+=tam;
-    }
-}
-
-void* mi_memcpy(void* destino, const void* origen, size_t n){
-    char* end = (char*)origen+n;
-    char* temp_d = (char*)destino;
-    const char* temp_o = (const char*)origen;
-    while(temp_o<end){
-        *temp_d = *temp_o;
-        temp_o++;
-        temp_d++;
-    }
-    return destino;
-}
-
-void* mi_memmove(void* destino, const void* origen, size_t n){
-    if(n==0)
-        return destino;
-    if(destino<origen){
-        char* end = (char*)origen+n;
-        char* temp_d = (char*)destino;
-        const char* temp_o = (const char*)origen;
-        while(temp_o<end){
-            *temp_d = *temp_o;
-            temp_o++;
-            temp_d++;
-        }
-    }
-    else{
-        char* beg = (char*)origen;
-        char* temp_d = (char*)destino+n-1;
-        const char* temp_o = (const char*)origen+n-1;
-        while(temp_o>=beg){
-            *temp_d = *temp_o;
-            temp_d--;
-            temp_o--;
-        }
-    }
-    return destino;
 }
 
 int contElementos(const char* nomArch, size_t tam){
@@ -303,23 +207,23 @@ char menuBase(const char* msj, const char* opc){
     do{
         printf("%s",msj);
         scanf(" %c",&op);
+        while(getchar() != '\n');
     }while(strchr(opc,op)==NULL);
     return op;
 }
 
-///FUNCIONALIDADES MINIMAS
+int funcionesABM(const char* piloto, const char* escu, const char* carrera){
 
-int funcionesABM(const char* piloto, const char* escu, const char* carrera)
-{
     char opAccion, opArchivo;
-
-
+    system("cls");
     opAccion=menuBase(MENUABM,OPCIONES_ABM);
-    if(opAccion!='4')
+    if(opAccion!='4'){
+        system("cls");
         opArchivo=menuBase(MENUABMARCHIVOS,OPCIONES_ABMARCH);
-
+        if(opArchivo==3)
+            return 0;
+    }
     FILE* pf=fopen((opArchivo=='1'?piloto:(opArchivo=='2'?escu:carrera)),"r+b");
-
     if(pf==NULL)
         return ERR_AP;
 
@@ -328,7 +232,7 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera)
             opArchivo=='1'?ingresarRegPiloto(pf, sizeof(tPiloto)):ingresarRegEscuderia(pf, sizeof(tEscuderia));
             break;
         case '2':
-///            bajaRegPiloto(pf, sizeof(tPiloto),piloto, ARCH_BAJAS);
+            opAccion=='1'?bajaRegPiloto(pf,sizeof(tPiloto), ARCH_PILOTOBAJAS):bajaRegEscuderia(pf,sizeof(tEscuderia), ARCH_ESCUDBAJAS);
             break;
         case '3':
             opArchivo=='1'?modifiPiloto(pf, piloto,sizeof(tPiloto)): modifiEscuderia(pf, escu,sizeof(tEscuderia));
@@ -339,6 +243,72 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera)
     fclose(pf);
     return TODO_OK;
 }
+
+
+int bajaRegPiloto(FILE* pf, size_t tam, const char* arc)
+{
+    tPiloto aux;
+    int auxId;
+    FILE* pb;
+
+    pb=fopen(arc,"r+b");
+    if(pb==NULL)
+    {
+        pb=fopen(arc,"w+b");
+        if(pb==NULL)
+            return ERR_AP;
+    }
+
+    printf("Ingrese la id del piloto: ");
+    scanf("%d", &auxId);
+
+    aux=busquedaPiloto(pf,auxId,tam);
+    if(auxId!=-1)
+    {
+        aux.estado='R';
+        fseek(pf,-tam,SEEK_CUR);
+        fwrite(&aux,tam,1,pf);
+
+        fseek(pb,0,SEEK_END);
+        fwrite(&aux,tam,1,pb);
+
+    }
+    fclose(pb);
+    return TODO_OK;
+}
+
+int bajaRegEscuderia(FILE* pf, size_t tam, const char* arc)
+{
+    tEscuderia aux;
+    int auxId;
+    FILE* pb;
+
+    pb=fopen(arc,"r+b");
+    if(pb==NULL)
+    {
+        pb=fopen(arc,"w+b");
+        if(pb==NULL)
+            return ERR_AP;
+    }
+
+    printf("Ingrese la id de la escuderia: ");
+    scanf("%d", &auxId);
+
+    aux=busquedaEscuderia(pf,auxId,tam);
+    if(auxId!=-1)
+    {
+        aux.estado=0;
+        fseek(pf,-tam,SEEK_CUR);
+        fwrite(&aux,tam,1,pf);
+
+        fseek(pb,0,SEEK_END);
+        fwrite(&aux,tam,1,pb);
+
+    }
+    fclose(pb);
+    return TODO_OK;
+}
+
 
 tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam)
 {
@@ -433,8 +403,6 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam)
 
     printf("\tIngrese la id del piloto que quiere modificar: ");
     scanf("%d", &auxId);
-
-
     aux=busquedaPiloto(pf,auxId,tam);
 
     if(aux.id!=-1)
@@ -463,9 +431,9 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam)
             aux.id_escuderia=(unsigned int)valor;
             break;
         case '4':
-            valor=malloc(sizeof(char));
+            valor=malloc(sizeof(char*));
             fflush(stdin);
-            scanf("%c", (char)valor);
+            scanf("%c", (char*)valor);
             aux.estado=(char)valor;
             break;
         case '5':
@@ -486,36 +454,6 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam)
     }
 }
 
-/*
-void bajaRegPiloto(FILE* pf, size_t tam, const char* arc,int cmp(const void*, const void*))
-{
-    void* aux;
-    char auxEstado;
-    unsigned int auxId;
-
-    printf("\n Ingrese la id del piloto que desea dar de baja: ");
-    scanf("%d", &auxId);
-
-    printf("\n Ingrese en que estado esta: ");
-    fflush(stdin);
-    scanf("%c", &auxEstado);
-
-    fread(aux,tam,1,pf);
-
-    while(!feof(pf))
-    {
-        if((cmp(auxId,aux))==0)
-        {
-            fseek(pf,-tam,SEEK_CUR);
-            cambio(auxEstado, aux);
-            fwrite(aux,tam,1,pf);
-        }
-        fseek(pf,0,1);
-        fread(aux, tam,1,pf);
-    }
-
-}
-*/
 
 
 void ingresarRegEscuderia(FILE* pf, size_t tam)
@@ -580,7 +518,7 @@ void ingresarRegPiloto(FILE* pf, size_t tam)
         printf("\n\tIngrese el estado del piloto(A:Activo, R:Retirado, S:Suspendido): ");
         fflush(stdin);
         scanf("%c", &aux.estado);
-        toupper(aux.estado);
+        aux.estado=toupper(aux.estado);
     }while(aux.estado!='A'&&aux.estado!='R'&&aux.estado!='S');
 
     printf("\n\tIngrese la fecha de nacimiento del piloto: ");
@@ -590,6 +528,7 @@ void ingresarRegPiloto(FILE* pf, size_t tam)
     fwrite(&aux,tam,1,pf);
 }
 
+///FUNCIONALIDADES MINIMAS
 
 int listarPilotos(const char* nomArch, void mostrar(const void*)){
     tPiloto p;
@@ -660,16 +599,21 @@ int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(con
             scanf("%d", &aux);
             piloto_valido = buscarEnArchivo(nomArchPil, &aux, &pil_aux, sizeof(tPiloto), cmp);
             if(piloto_valido == 0)
-                printf("Error: El corredor ingresado no esta registrado. Intente nuevamente.\n");
+                printf("El corredor ingresado no esta registrado. Intente nuevamente.\n");
             else if(pil_aux.estado != 'A'){
-                printf("El piloto %s se encuentra inactivo (Estado: %c).\n", pil_aux.nombre, pil_aux.estado);
+                printf("El piloto %s con id %d se encuentra inactivo (Estado: %c).\n", pil_aux.nombre, pil_aux.id, pil_aux.estado);
                 piloto_valido = 0;
             }
         }while(piloto_valido == 0);
 
         pActual->id_piloto = aux;
-        printf("Ingrese la posicion del piloto %d en la carrera: ", aux);
-        scanf("%d", &(pActual->posicion));
+        do{
+            printf("Ingrese la posicion del piloto %d en la carrera: ", aux);
+            scanf("%d", &(pActual->posicion));
+            if(pActual->posicion<0 || pActual->posicion>pc.cant_resultados)
+                printf("\nLa posicion ingresada no es valida. Intente nuevamente.");
+        }while(pActual->posicion<0 || pActual->posicion>pc.cant_resultados);
+
         if(pActual->posicion > 0 && pActual->posicion <= 10)
             pActual->total_puntos = puntos_f1[pActual->posicion - 1];
         else
@@ -738,8 +682,8 @@ int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, voi
                 }
                 fread(&p, sizeof(tPiloto), 1, pfPil);
             }
-            fread(&e, sizeof(tEscuderia), 1, pfEscu);
         }
+        fread(&e, sizeof(tEscuderia), 1, pfEscu);
     }
     fclose(pfPil);
     fclose(pfEscu);
@@ -855,8 +799,8 @@ void mostrarPeorPosicion(tEstadisticaPiloto* vec, size_t cant){
 
 tEstadisticaPiloto* generarEstadisticas(size_t* ce){
     FILE* pfCar;
-    tCarrera car;
-    tResultado res;
+    tCarrera car = {0};
+    tResultado res = {0};
     tPiloto p;
     int i = 0, pos, cant_activos = 0;
     *ce = contElementos(ARCH_PILOTO, sizeof(tPiloto));
@@ -870,26 +814,23 @@ tEstadisticaPiloto* generarEstadisticas(size_t* ce){
         free(vec);
         return NULL;
     }
-    fread(&p, sizeof(tPiloto), 1, pfPil);
-    while(!feof(pfPil)){
+    while(fread(&p, sizeof(tPiloto), 1, pfPil)==1){
         if(p.estado=='A'){
             (vec+cant_activos)->id_piloto = p.id;
             strcpy((vec+cant_activos)->nombre, p.nombre);
             (vec+cant_activos)->mejor_posicion = 999;
+            (vec+cant_activos)->puntos_acumulados = 0;
             cant_activos++;
         }
-        fread(&p, sizeof(tPiloto), 1, pfPil);
     }
     fclose(pfPil);
     *ce = cant_activos;
 
     pfCar = fopen(ARCH_CARRERA, "rb");
     if(!pfCar){
-        free(vec);
-        return NULL;
+        return vec;
     }
-    fread(&car, sizeof(tCarrera), 1, pfCar);
-    while(!feof(pfCar)){
+    while(fread(&car, sizeof(tCarrera), 1, pfCar)==1){
         for(i=0; i<car.cant_resultados; i++){
             fread(&res, sizeof(tResultado), 1, pfCar);
             if(car.estado==1){
@@ -897,6 +838,7 @@ tEstadisticaPiloto* generarEstadisticas(size_t* ce){
                 if(pos!= -1){
                     (vec+pos)->cant_carreras_corridas++;
                     (vec+pos)->suma_posiciones += res.posicion;
+                    (vec+pos)->puntos_acumulados += res.total_puntos;
                     if(res.posicion==1)
                         (vec+pos)->victorias++;
                     if(res.posicion < (vec+pos)->mejor_posicion)
@@ -906,7 +848,6 @@ tEstadisticaPiloto* generarEstadisticas(size_t* ce){
                 }
             }
         }
-        fread(&car, sizeof(tCarrera), 1, pfCar);
     }
     fclose(pfCar);
     for(i=0; i<*ce; i++){
@@ -915,6 +856,7 @@ tEstadisticaPiloto* generarEstadisticas(size_t* ce){
         else{
             (vec+i)->promedio_posicion = 0.0;
             (vec+i)->mejor_posicion = 0;
+            (vec+i)->peor_posicion = 0;
         }
     }
     return vec;
@@ -1043,3 +985,154 @@ int exportarCarreraATXT(const char* nomArchBin, const char* nomArchTXT){
     return TODO_OK;
 }
 
+
+///PUNTOS ADICIONALES
+
+int simularCarrera(const char* nomArchPil, const char* nomArchCar){
+    size_t cant_pil_act;
+    tCarrera car = {0};
+    int* vec_pos;
+    FILE* pf_pil = fopen(nomArchPil, "rb");
+    FILE* pf_car;
+    if(!pf_pil)
+        return ERR_AP;
+    cant_pil_act = contPilActivos(pf_pil);
+    if(cant_pil_act==0){
+        fclose(pf_pil);
+        return ERR;
+    }
+    system("cls");
+    printf("La cantidad de pilotos activos es de %d.\nLa carrera sera entre todos ellos.", cant_pil_act);
+    vec_pos = asignarPosiciones(pf_pil, cant_pil_act);
+    if(!vec_pos){
+        fclose(pf_pil);
+        return ERR_MEM;
+    }
+
+    car.id = validarIdCar(nomArchCar);
+    car.cant_resultados = cant_pil_act;
+    car.fecha = time(NULL);
+    car.estado = 1;
+    printf("\nIngrese el nombre del circuito: ");
+    while(getchar() != '\n');
+    fgets(car.circuito, sizeof(car.circuito), stdin);
+    car.circuito[strcspn(car.circuito, "\n")] = 0;
+
+    car.matriz = malloc(cant_pil_act*sizeof(tResultado));
+    if(!car.matriz){
+        free(vec_pos);
+        fclose(pf_pil);
+        return ERR_MEM;
+    }
+    asignarPuntos(&car, vec_pos);
+    pf_car = fopen(nomArchCar, "ab");
+    if(!pf_car){
+        free(car.matriz);
+        free(vec_pos);
+        fclose(pf_pil);
+        return ERR_AP;
+    }
+    fwrite(&car, sizeof(tCarrera), 1, pf_car);
+    fwrite(car.matriz, sizeof(tResultado), car.cant_resultados, pf_car);
+    fclose(pf_car);
+    fclose(pf_pil);
+
+    mostrarResultados(&car);
+
+    free(car.matriz);
+    free(vec_pos);
+    printf("\nCarrera simulada y guardada con exito!\n");
+    return TODO_OK;
+}
+
+size_t contPilActivos(FILE* pf){
+    size_t cont = 0;
+    tPiloto p;
+    rewind(pf);
+    fread(&p, sizeof(tPiloto), 1, pf);
+    while(!feof(pf)){
+        if(p.estado=='A')
+            cont++;
+        fread(&p, sizeof(tPiloto), 1, pf);
+    }
+    return cont;
+}
+
+int* asignarPosiciones(FILE* pf_pil, size_t cant_pil_act){
+    int* vec_pos = malloc(cant_pil_act*sizeof(int));
+    int j, temp, i=0;
+    if(!vec_pos)
+        return NULL;
+    tPiloto p;
+    rewind(pf_pil);
+    fread(&p, sizeof(tPiloto), 1, pf_pil);
+    while(!feof(pf_pil)){
+        if(p.estado=='A'){
+            *(vec_pos+i) = p.id;
+            i++;
+        }
+        fread(&p, sizeof(tPiloto), 1, pf_pil);
+    }
+    srand((unsigned)time(NULL));
+    for(i=cant_pil_act-1; i>0 ;i--){
+        j = rand()%(i+1);
+        temp = *(vec_pos+i);
+        *(vec_pos+i) = *(vec_pos+j);
+        *(vec_pos+j) = temp;
+    }
+    return vec_pos;
+}
+
+int validarIdCar(const char* nomArchCar){
+    int id_car;
+    do{
+        printf("\nIngrese el id de la carrera: ");
+        scanf("%d", &id_car);
+        if(buscarCarreraId(nomArchCar, id_car)==1)
+            printf("\nEl id de carrera ingresado ya existe. Intente nuevamente.");
+    }while(buscarCarreraId(nomArchCar, id_car)==1);
+    return id_car;
+}
+
+int buscarCarreraId(const char* nomArchCar, int id_buscado){
+    FILE* pf = fopen(nomArchCar, "rb");
+    if (!pf)
+        return ERR_AP;
+    tCarrera car;
+    fread(&car, sizeof(tCarrera), 1, pf);
+    while (!feof(pf)) {
+        if (car.id == id_buscado) {
+            fclose(pf);
+            return 1;
+        }
+        fseek(pf, car.cant_resultados * sizeof(tResultado), SEEK_CUR);
+        fread(&car, sizeof(tCarrera), 1, pf);
+    }
+    fclose(pf);
+    return 0;
+}
+
+void asignarPuntos(tCarrera* c, int* vec_pos){
+    int i;
+    int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
+    tResultado* res = c->matriz;
+    for(i=0; i<c->cant_resultados; i++){
+        (res+i)->id_piloto = *(vec_pos+i);
+        (res+i)->posicion = i + 1;
+        if(i<10)
+            (res+i)->total_puntos = puntos_f1[i];
+        else
+            (res+i)->total_puntos = 0;
+    }
+}
+
+void mostrarResultados(tCarrera* car){
+    size_t i;
+    tResultado* res = car->matriz;
+    printf("\n=== RESULTADOS DEL CIRCUITO: %s ===\n", car->circuito);
+    printf(" POS | ID PILOTO | PUNTOS \n");
+    printf("--------------------------\n");
+    for(i=0; i<car->cant_resultados; i++)
+        printf(" %3d | %9d | %6d \n", (res+i)->posicion, (res+i)->id_piloto, (res+i)->total_puntos);
+    printf("==========================\n");
+}

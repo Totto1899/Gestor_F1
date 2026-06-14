@@ -11,6 +11,7 @@ int cmpPilotosPorPuntos(const void*, const void*);
 void mostrarPiloto(const void* v); ///tambien usada para item 5
 
 int main(){
+    /*
     generarLoteEscuderiasTXT(CARGA_ESCUD);
     generarLotePilotosTXT(CARGA_PILOTO);
 
@@ -46,7 +47,7 @@ int main(){
     generarLoteArchivoCarrera(ARCH_CARRERA, ARCH_PILOTO);
 
     printf("--- MIGRACION FINALIZADA ---\n");
-
+    */
     int flag;
     char op = 0;
 
@@ -87,19 +88,24 @@ int main(){
                 menuExportarATXT();
                 break;
             case '7':
-                flag=funcionesABM(ARCH_PILOTO, ARCH_ESCUD, ARCH_CARRERA);
+                flag = funcionesABM(ARCH_PILOTO, ARCH_ESCUD, ARCH_CARRERA);
                 if(flag==ERR_AP)
-                    printf("\nNo se pudo abrir el puntero");
+                    printf("\nNo se pudo abrir algun archivo .dat");
                 break;
             case '8':
+                flag = simularCarrera(ARCH_PILOTO, ARCH_CARRERA);
+                break;
+            case '9':
+                break;
+            case '0':
                 printf("\n\t ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
                 break;
         }
-        if(op!='8'){
+        if(op!='0'){
             printf("\n");
             system("pause");
         }
-    }while(op!='8');
+    }while(op!='0');
     return 0;
 }
 
