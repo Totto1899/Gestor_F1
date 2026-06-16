@@ -232,7 +232,7 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera){
             opArchivo=='1'?ingresarRegPiloto(pf, sizeof(tPiloto)):ingresarRegEscuderia(pf, sizeof(tEscuderia));
             break;
         case '2':
-            opAccion=='1'?bajaRegPiloto(pf,sizeof(tPiloto), ARCH_PILOTOBAJAS):bajaRegEscuderia(pf,sizeof(tEscuderia), ARCH_ESCUDBAJAS);
+            opArchivo=='1'?bajaRegPiloto(pf,sizeof(tPiloto), ARCH_PILOTOBAJAS):bajaRegEscuderia(pf,sizeof(tEscuderia), ARCH_ESCUDBAJAS);
             break;
         case '3':
             opArchivo=='1'?modifiPiloto(pf, piloto,sizeof(tPiloto)): modifiEscuderia(pf, escu,sizeof(tEscuderia));
@@ -386,8 +386,8 @@ void modifiEscuderia(FILE* pf, const char* arc, size_t tam)
             break;
         case '4':
             valor=malloc(sizeof(int));
-            scanf("%d", &valor);
-            aux.estado=(int)valor;
+            scanf("%d", (int*)&valor);
+            aux.estado=*(int*)valor;
         }
         fwrite(&aux,tam,1,pf);
         free(valor);
@@ -426,9 +426,9 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam)
             strcpy(aux.nombre,(char*)valor);
             break;
         case '3':
-            valor=malloc(sizeof(unsigned int));
-            scanf("%u",&valor);
-            aux.id_escuderia=(unsigned int)valor;
+            valor=malloc(sizeof(unsigned int*));
+            scanf("%u",(unsigned int*)&valor);
+            aux.id_escuderia= *(unsigned int*)valor;
             break;
         case '4':
             valor=malloc(sizeof(char*));
@@ -442,9 +442,9 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam)
             aux.fechaNacimiento=(long long unsigned)valor;
             break;
         case '6':
-            valor= malloc(sizeof(unsigned));
-            scanf("%u", &valor);
-            aux.puntos_acumulados=(unsigned)valor;
+            valor= malloc(sizeof(unsigned*));
+            scanf("%u", (unsigned*)&valor);
+            aux.puntos_acumulados=* (unsigned*)valor;
             break;
         case '7':
             break;
@@ -493,11 +493,13 @@ void ingresarRegPiloto(FILE* pf, size_t tam)
     unsigned int auxId;
     tPiloto aux;
 
+    rewind(pf);
     fseek(pf,-tam,SEEK_END);
     fread(&aux,tam,1,pf);
-    auxId=(aux.id)+1;
+    auxId=((int)(aux.id))+1;
 
     aux.id=auxId;
+    printf("%u", auxId);
 
     printf("\n\tIngrese el nombre del piloto: ");
     fflush(stdin);
@@ -918,7 +920,7 @@ void menuExportarATXT(){
                     printf("Bajas exportadas con exito!\n");
 
                 if(estado == ERR_NOTARC)
-                    printf("El archivo que quiere exportar no exixste...\n");
+                    printf("El archivo que quiere exportar no existe...\n");
                 system("pause");
                 break;
         }
@@ -1013,7 +1015,7 @@ int simularCarrera(const char* nomArchPil, const char* nomArchCar){
         return ERR;
     }
     system("cls");
-    printf("La cantidad de pilotos activos es de %d.\nLa carrera sera entre todos ellos.", cant_pil_act);
+    printf("La cantidad de pilotos activos es de %d.\nLa carrera sera entre todos ellos.",(int)cant_pil_act);
     vec_pos = asignarPosiciones(pf_pil, cant_pil_act);
     if(!vec_pos){
         fclose(pf_pil);

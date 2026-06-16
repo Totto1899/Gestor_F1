@@ -1,0 +1,5 @@
+ID: 105  | Piloto: Lewis Hamilton       | Estado: R | Puntos: 220
+ID: 105  | Piloto: Lewis Hamilton       | Estado: R | Puntos: 220
+ID: 106  | Piloto: George Russell       | Estado: R | Puntos: 160
+ID: 1    | Piloto: luis                 | Estado: R | Puntos: 3
+ID: 2    | Piloto: jamon                | Estado: R | Puntos: 2
