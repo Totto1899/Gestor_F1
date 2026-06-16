@@ -434,7 +434,7 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam)
             valor=malloc(sizeof(char*));
             fflush(stdin);
             scanf("%c", (char*)valor);
-            aux.estado=(char)valor;
+            aux.estado= * (char*)valor;
             break;
         case '5':
             valor=malloc(sizeof(long long unsigned));
