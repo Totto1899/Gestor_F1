@@ -4,7 +4,7 @@ int trozarPilotos(void* vec, size_t tam, const char* linea);
 int trozarEscuderia(void* vec, size_t tam, const char* linea);
 
 ///item 2
-int cmpPilotorPorId(const void* clave, const void* registro);
+int cmpPilotoPorId(const void* clave, const void* registro);
 
 ///item 4
 int cmpPilotosPorPuntos(const void*, const void*);
@@ -70,7 +70,7 @@ int main(){
                     printf("\nNo se pudo abrir el archivo de pilotos.dat");
                 break;
             case '2':
-                flag = registrarCarrera(ARCH_CARRERA, ARCH_PILOTO, cmpPilotorPorId);
+                flag = registrarCarrera(ARCH_CARRERA, ARCH_PILOTO, cmpPilotoPorId);
                 if(flag==ERR_AP)
                     printf("\nNo se pudo abrir el archivo de carreras.dat");
                 else if(flag==ERR_MEM)
@@ -110,7 +110,6 @@ int main(){
                     printf("\nNo se pudo reservar memoria!");
                 break;
             case '9':
-                {
                 char temp1[20] = ARCH_CARRERA;
                 char temp2[20] = ARCH_CARRERA2;
                 char resultado[20] = "combinado.dat";
@@ -125,7 +124,6 @@ int main(){
             case '0':
                 printf("\n\t ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
                 break;
-                }
         }
         if(op!='0'){
             printf("\n");
@@ -202,7 +200,7 @@ void mostrarPiloto(const void* v){
     printf("ID: %d | Nombre: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
 }
 
-int cmpPilotorPorId(const void* clave,const void* registro){
+int cmpPilotoPorId(const void* clave,const void* registro){
     int id_buscado = *(int*)clave;
     tPiloto* pil = (tPiloto*)registro;
     return id_buscado - pil->id;
