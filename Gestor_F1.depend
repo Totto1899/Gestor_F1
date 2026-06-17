@@ -1,27 +1,27 @@
 # depslib dependency file v1.0
-1781458253 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\functions.c
+1781654759 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\functions.c
 	"library.h"
 
-1781458509 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\main.c
+1781645744 source:c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\main.c
 	"library.h"
 
-1781457299 c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\library.h
+1781645744 c:\users\jorge\onedrive\desktop\tp_integrador_ losmodulados\gestor_f1\library.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<time.h>
 	<ctype.h>
 
-1781648331 source:c:\users\pc\documents\github\gestor_f1\functions.c
+1781722452 source:c:\users\pc\documents\github\gestor_f1\functions.c
 	"library.h"
 
-1781646375 c:\users\pc\documents\github\gestor_f1\library.h
+1781722766 c:\users\pc\documents\github\gestor_f1\library.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<time.h>
 	<ctype.h>
 
-1781646385 source:c:\users\pc\documents\github\gestor_f1\main.c
+1781722313 source:c:\users\pc\documents\github\gestor_f1\main.c
 	"library.h"
 

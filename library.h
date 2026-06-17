@@ -22,20 +22,20 @@
 #define ARCH_CARRERA2 "carreras2.dat"
 #define ARCH_PILOTOBAJAS "pilotos_bajas.dat"
 #define ARCH_ESCUDBAJAS "escuderias_bajas.dat"
+#define ARCH_CARRERABAJAS "carreras_bajas.dat"
 
 //MACROS DE MENU
 
 #define MENUBASE "\n\t---- GESTOR DE F1 ----\n" \
                  "\tINGRESE LA OPCIÓN DESEADA:\n" \
                  "\t1 - Listar pilotos\n" \
-                 "\t2 - Registrar una carrera\n" \
-                 "\t3 - Mostrar ranking de pilotos de la temporada\n" \
-                 "\t4 - Mostrar pilotos por escudería\n" \
-                 "\t5 - Calcular estadísticas de pilotos\n" \
-                 "\t6 - Exportar datos a archivos de texto\n" \
-                 "\t7 - Dar de baja, alta o modificar\n" \
-                 "\t8 - Simular una carrera\n" \
-                 "\t9 - Combinar temporadas\n" \
+                 "\t2 - Mostrar ranking de pilotos de la temporada\n" \
+                 "\t3 - Mostrar pilotos por escudería\n" \
+                 "\t4 - Calcular estadísticas de pilotos\n" \
+                 "\t5 - Exportar datos a archivos de texto\n" \
+                 "\t6 - Dar de baja, alta o modificar\n" \
+                 "\t7 - Simular una carrera\n" \
+                 "\t8 - Combinar temporadas\n" \
                  "\t0 - Finalizar programa\n" \
                  "\t--> "
 
@@ -49,7 +49,8 @@
 #define MENUABMARCHIVOS "\n\t----INGRESE SOBRE QUE ARCHIVO ----\n"\
                         "\t1 - Pilotos\n"\
                         "\t2 - Escuderias\n"\
-                        "\t3 - Volver al menu\n"\
+                        "\t3 - Carrera\n"\
+                        "\t4 - Volver al menu\n"\
                         "\t-->"
 
 
@@ -89,9 +90,9 @@
                           "Elija una opcion: "
 
 
-#define OPCIONES_MENU "0123456789"
+#define OPCIONES_MENU "012345678"
 #define OPCIONES_ABM "1234"
-#define OPCIONES_ABMARCH "123"
+#define OPCIONES_ABMARCH "1234"
 #define OPCIONES_MENUMODIPILOTO "1234567"
 #define OPCIONES_MENUMODIESCUDERIA "12345"
 
@@ -144,7 +145,7 @@ typedef struct{
     int id;
     char circuito[20];
     unsigned long long fecha;
-    int estado;
+    int estado;/// 1: activo 0:inactivo
     int cant_resultados;
     tResultado* matriz;
 }tCarrera;
@@ -160,11 +161,16 @@ int volcarABinario(const char* nomArch, const void* vec, size_t tam, size_t ce);
 int contElementos(const char* nomArch, size_t tam);
 
 ///FUNCIONES DE ABM
-int funcionesABM(const char* piloto, const char* escu, const char* carrera);
+int funcionesABM(const char* piloto, const char* escu, const char* carrera,int cmp(const void*, const void*));
+
 void ingresarRegPiloto(FILE* pf, size_t tam);
 void ingresarRegEscuderia(FILE* pf, size_t tam);
+int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
+
 int bajaRegPiloto(FILE* pf, size_t tam, const char* arc);
 int bajaRegEscuderia(FILE* pf, size_t tam,const char* arc);
+int bajaRegCarrera(FILE* pf, size_t tam,const char* arc);
+
 void modifiEscuderia(FILE* pf, const char* arc, size_t tam);
 void modifiPiloto(FILE* pf, const char* arc, size_t tam);
 
@@ -173,7 +179,6 @@ char menuBase(const char* msj, const char* opc);
 
 ///FUNCIONALIDADES MINIMAS
 int listarPilotos(const char* nomArch, void mostrar(const void*));///1
-int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
 int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos);///3
 int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));///4
 int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrar(const void*));///5

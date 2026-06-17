@@ -70,38 +70,29 @@ int main(){
                     printf("\nNo se pudo abrir el archivo de pilotos.dat");
                 break;
             case '2':
-                flag = registrarCarrera(ARCH_CARRERA, ARCH_PILOTO, cmpPilotorPorId);
-                if(flag==ERR_AP)
-                    printf("\nNo se pudo abrir el archivo de carreras.dat");
-                else if(flag==ERR_MEM)
-                    printf("\nNo se pudo reservar memoria.");
-                else if(flag==ERR_ACT)
-                    printf("\nSe registro la carrera, pero no se pudo actualizar pilotos.dat");
-                break;
-            case '3':
                 flag = listarPilotosPuntos(ARCH_PILOTO, cmpPilotosPorPuntos, mostrarPiloto);
                 if(flag==ERR_AP)
                     printf("\nNo se pudo abrir el archivo de pilotos.dat");
                 else if(flag==ERR_MEM)
                     printf("\nNo se pudo reservar memoria.");
                 break;
-            case'4':
+            case'3':
                 flag = mostrarPilotoXEscuderia(ARCH_PILOTO, ARCH_ESCUD, mostrarPiloto);
                 if(flag==ERR_AP)
                     printf("\nNo se pudo abrir el archivo de carreras.dat o pilotos.dat");
                 break;
-            case '5':
+            case '4':
                 menuEstadisticas();
                 break;
-            case '6':
+            case '5':
                 menuExportarATXT();
                 break;
-            case '7':
-                flag = funcionesABM(ARCH_PILOTO, ARCH_ESCUD, ARCH_CARRERA);
+            case '6':
+                flag = funcionesABM(ARCH_PILOTO, ARCH_ESCUD, ARCH_CARRERA, cmpPilotorPorId);
                 if(flag==ERR_AP)
                     printf("\nNo se pudo abrir algun archivo .dat");
                 break;
-            case '8':
+            case '7':
                 random = rand()%2;
                 flag = simularCarrera(ARCH_PILOTO, (random==0) ? ARCH_CARRERA : ARCH_CARRERA2);
                 if(flag==ERR_AP)
@@ -109,7 +100,7 @@ int main(){
                 else if(flag==ERR_MEM)
                     printf("\nNo se pudo reservar memoria!");
                 break;
-            case '9':
+            case '8':
                 {
                 char temp1[20] = ARCH_CARRERA;
                 char temp2[20] = ARCH_CARRERA2;
