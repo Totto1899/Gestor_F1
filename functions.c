@@ -533,7 +533,8 @@ int listarPilotos(const char* nomArch, void mostrar(const void*)){
         return ERR_AP;
     fread(&p, sizeof(tPiloto), 1, pf);
     while(!feof(pf)){
-        mostrar(&p);
+        if(p.estado=='A')
+            mostrar(&p);
         fread(&p, sizeof(tPiloto), 1, pf);
     }
     fclose(pf);
