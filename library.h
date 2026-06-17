@@ -173,13 +173,9 @@ char menuBase(const char* msj, const char* opc);
 
 ///FUNCIONALIDADES MINIMAS
 int listarPilotos(const char* nomArch, void mostrar(const void*));///1
-
 int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*));///2
-
 int actualizarPuntosPiloto(const char* nomArch, size_t id_pil, size_t puntos);///3
-
 int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), void mostrar(const void*));///4
-
 int mostrarPilotoXEscuderia(const char* nomArchPil, const char* nomArchEscu, void mostrar(const void*));///5
 
 ///6

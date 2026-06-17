@@ -474,6 +474,7 @@ void ingresarRegEscuderia(FILE* pf, size_t tam)
     fflush(stdin);
     gets(aux.nombre);
 
+
     printf("\n\tIngrese el pais de  la escuderia: ");
     fflush(stdin);
     gets(aux.pais);
@@ -532,6 +533,7 @@ void ingresarRegPiloto(FILE* pf, size_t tam)
 
 ///FUNCIONALIDADES MINIMAS
 
+///1
 int listarPilotos(const char* nomArch, void mostrar(const void*)){
     tPiloto p;
     FILE* pf = fopen(nomArch, "rb");
@@ -569,7 +571,7 @@ int listarPilotosPuntos(const char* nomArch, int cmp(const void*, const void*), 
     fclose(pf);
     return TODO_OK;
 }
-
+///2
 int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(const void*, const void*)){
     int puntos_f1[10] = {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
     int i, aux, piloto_valido, flag_advertencia = 0;

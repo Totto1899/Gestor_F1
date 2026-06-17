@@ -199,7 +199,7 @@ int cmpPilotosPorPuntos(const void* a, const void* b){
 
 void mostrarPiloto(const void* v){
     tPiloto* pil = (tPiloto*)v;
-    printf("ID: %d | Nombre: %-20s | Puntos: %d\n", pil->id, pil->nombre, pil->puntos_acumulados);
+    printf("ID: %d | Nombre: %-20s | Puntos: %d \n", pil->id, pil->nombre, pil->puntos_acumulados);
 }
 
 int cmpPilotorPorId(const void* clave,const void* registro){
