@@ -225,6 +225,7 @@ int escribirCarreraCompleta(FILE* pf, tCarrera* car);
 
 ///BUSQUEDA
 int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_t tam, int cmp(const void*, const void*));
+tCarrera busquedaCarrera(FILE* pf, size_t tam, int clave);
 
 ///ORDENAMIENTO
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));

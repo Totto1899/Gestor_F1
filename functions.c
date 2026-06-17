@@ -324,9 +324,54 @@ int bajaRegEscuderia(FILE* pf, size_t tam, const char* arc){
 
 int bajaRegCarrera(FILE* pf, size_t tam, const char* arc)
 {
+    tCarrera aux;
+    int auxId;
+    FILE* pb=fopen(arc,"ab");
+    if(pb==NULL)
+        return ERR_AP;
 
+    printf("Ingrese la carrera que quiere dar de baja: ");
+    scanf("%d",&auxId);
 
+    aux=busquedaCarrera(pf,tam,auxId);
+    if(aux!=-1)
+    {
+        fseek(pf,-(tam+sizeof(tResultado)*aux.cant_resultados),SEEK_CUR);
+        aux.estado=0;
+        fwrite(&aux,tam,1,pf);
+
+        fwrite(&aux,tam,1,pb);
+        fclose(pb);
+    }
+    return TODO_OK;
 }
+
+tCarrera busquedaCarrera(FILE* pf, size_t tam, int clave)
+{
+    tCarrera aux;
+    tResultado auxResu;
+    int enco=0;
+    rewind(pf);
+
+    fread(&aux,tam,1,pf);
+    fread(&auxResu,sizeof(tResultado),aux.cant_resultados,pf);
+
+    while(!feof(pf) && !enco)
+    {
+        if(aux.id==clave)
+            enco=1;
+        else
+        {
+            fread(&aux,tam,1,pf);
+            fread(&auxResu,sizeof(tResultado),aux.cant_resultados,pf);
+        }
+    }
+    if(!enco)
+        aux.id=-1;
+
+    return aux;
+}
+
 
 void modifiEscuderia(FILE* pf, const char* arc, size_t tam){
     tEscuderia aux;
@@ -431,7 +476,6 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam){
     else
         printf("\nNo se encontro un piloto con esa ID.\n");
 }
-
 
 
 void ingresarRegEscuderia(FILE* pf, size_t tam){
