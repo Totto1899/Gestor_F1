@@ -13,6 +13,7 @@
 #define ERR 0
 #define ERR_NOTARC -6
 
+
 //MACROS DE ARCHIVOS
 #define CARGA_PILOTO "pilotos.txt"
 #define CARGA_ESCUD "escuderias.txt"
@@ -95,6 +96,8 @@
 #define OPCIONES_ABMARCH "1234"
 #define OPCIONES_MENUMODIPILOTO "1234567"
 #define OPCIONES_MENUMODIESCUDERIA "12345"
+#define OPCIONES_ESTADISTICAS "01234"
+#define OPCIONES_EXPORTACION "012345"
 
 
 //BIBLIOTECAS UTILIZADAS
@@ -170,6 +173,9 @@ int registrarCarrera(const char* nomArchCar, const char* nomArchPil, int cmp(con
 int bajaRegPiloto(FILE* pf, size_t tam, const char* arc);
 int bajaRegEscuderia(FILE* pf, size_t tam,const char* arc);
 int bajaRegCarrera(FILE* pf, size_t tam,const char* arc);
+int cmpPilotoId(const void* idPiloto, const void* reg);
+int cmpEscuderiaId(const void* idEscu, const void* reg);
+
 
 void modifiEscuderia(FILE* pf, const char* arc, size_t tam);
 void modifiPiloto(FILE* pf, const char* arc, size_t tam);
@@ -219,8 +225,6 @@ int escribirCarreraCompleta(FILE* pf, tCarrera* car);
 
 ///BUSQUEDA
 int buscarEnArchivo(const char* nomArch, const void* clave, void* destino, size_t tam, int cmp(const void*, const void*));
-tPiloto busquedaPiloto(FILE *pf, int clave, size_t tam);
-tEscuderia busquedaEscuderia(FILE* pf, int clave, size_t tam);
 
 ///ORDENAMIENTO
 void ssort(void* vec, size_t ce, size_t tam, int cmp(const void*, const void*));

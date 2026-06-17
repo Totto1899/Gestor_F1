@@ -4,14 +4,14 @@ int trozarPilotos(void* vec, size_t tam, const char* linea);
 int trozarEscuderia(void* vec, size_t tam, const char* linea);
 
 ///item 2
-int cmpPilotorPorId(const void* clave, const void* registro);
+int cmpPilotoPorId(const void* clave, const void* registro);
 
 ///item 4
 int cmpPilotosPorPuntos(const void*, const void*);
 void mostrarPiloto(const void* v); ///tambien usada para item 5
 
 int main(){
-    /*
+/*
     generarLoteEscuderiasTXT(CARGA_ESCUD);
     generarLotePilotosTXT(CARGA_PILOTO);
 
@@ -54,10 +54,12 @@ int main(){
         printf("[OK] El archivo de carreras fue destruido y vaciado a 0 bytes.\n");
         system("pause");
     }
-    */
 
+*/
     srand(time(NULL));
     int flag, random;
+    FILE* pf= fopen(ARCH_CARRERA,"wb");
+    fclose(pf);
     char op = 0;
 
     do{
@@ -88,7 +90,7 @@ int main(){
                 menuExportarATXT();
                 break;
             case '6':
-                flag = funcionesABM(ARCH_PILOTO, ARCH_ESCUD, ARCH_CARRERA, cmpPilotorPorId);
+                flag = funcionesABM(ARCH_PILOTO, ARCH_ESCUD, ARCH_CARRERA, cmpPilotoPorId);
                 if(flag==ERR_AP)
                     printf("\nNo se pudo abrir algun archivo .dat");
                 break;
@@ -116,11 +118,11 @@ int main(){
             case '0':
                 printf("\n\t ---- GRACIAS POR USAR EL GESTOR DE F1 ----\n");
                 break;
-                }
         }
         if(op!='0'){
             printf("\n");
             system("pause");
+        }
         }
     }while(op!='0');
     return 0;
@@ -193,7 +195,7 @@ void mostrarPiloto(const void* v){
     printf("ID: %d | Nombre: %-20s | Puntos: %d \n", pil->id, pil->nombre, pil->puntos_acumulados);
 }
 
-int cmpPilotorPorId(const void* clave,const void* registro){
+int cmpPilotoPorId(const void* clave,const void* registro){
     int id_buscado = *(int*)clave;
     tPiloto* pil = (tPiloto*)registro;
     return id_buscado - pil->id;
