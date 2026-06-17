@@ -58,8 +58,7 @@ int main(){
 */
     srand(time(NULL));
     int flag, random;
-    FILE* pf= fopen(ARCH_CARRERA,"wb");
-    fclose(pf);
+
     char op = 0;
 
     do{
