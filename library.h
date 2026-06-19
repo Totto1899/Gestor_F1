@@ -73,6 +73,14 @@
                             "\t5 - Volver al menu\n"\
                             "\t-->"
 
+#define MENU_MODICARRERA "\n\t----INGRESE QUE CAMPO QUIERE MODIFICAR----\n"\
+                         "\t1 - Circuito\n"\
+                         "\t2 - Fecha\n"\
+                         "\t3 - Estado\n"\
+                         "\t4 - Matriz de resultados\n"\
+                         "\t5 - Volver al menu\n"\
+                         "\t-->"
+
 #define MENU_EXPORTACION "\n=== MENU DE EXPORTACION A TXT ===\n" \
                          "1. Exportar Pilotos\n" \
                          "2. Exportar Escuderias\n" \
@@ -96,6 +104,7 @@
 #define OPCIONES_ABMARCH "1234"
 #define OPCIONES_MENUMODIPILOTO "1234567"
 #define OPCIONES_MENUMODIESCUDERIA "12345"
+#define OPCIONES_MENUMODICARRERA "12345"
 #define OPCIONES_ESTADISTICAS "01234"
 #define OPCIONES_EXPORTACION "012345"
 
@@ -176,7 +185,8 @@ int bajaRegCarrera(FILE* pf, size_t tam,const char* arc);
 int cmpPilotoId(const void* idPiloto, const void* reg);
 int cmpEscuderiaId(const void* idEscu, const void* reg);
 
-
+int modifiCarrera(FILE* pf, const char* arc, size_t tam);
+void modifiMatrizResultados(tCarrera* car, tResultado* vec);
 void modifiEscuderia(FILE* pf, const char* arc, size_t tam);
 void modifiPiloto(FILE* pf, const char* arc, size_t tam);
 

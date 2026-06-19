@@ -243,7 +243,7 @@ int funcionesABM(const char* piloto, const char* escu, const char* carrera, int 
             opArchivo=='1'?bajaRegPiloto(pf,sizeof(tPiloto), ARCH_PILOTOBAJAS):(opArchivo=='2'?bajaRegEscuderia(pf,sizeof(tEscuderia), ARCH_ESCUDBAJAS):bajaRegCarrera(pf,sizeof(tCarrera), ARCH_CARRERABAJAS));
             break;
         case '3':
-            opArchivo=='1'?modifiPiloto(pf, piloto,sizeof(tPiloto)): modifiEscuderia(pf, escu,sizeof(tEscuderia));
+            opArchivo=='1'?modifiPiloto(pf, piloto,sizeof(tPiloto)): opArchivo=='2'?modifiEscuderia(pf, escu,sizeof(tEscuderia)):modifiCarrera(pf, carrera, sizeof(tCarrera));
             break;
         case '4':
             break;
@@ -322,53 +322,57 @@ int bajaRegEscuderia(FILE* pf, size_t tam, const char* arc){
     return TODO_OK;
 }
 
-int bajaRegCarrera(FILE* pf, size_t tam, const char* arc)
-{
+int bajaRegCarrera(FILE* pf, size_t tam, const char* arc){
     tCarrera aux;
     int auxId;
-    FILE* pb=fopen(arc,"ab");
-    if(pb==NULL)
-        return ERR_AP;
+    FILE* pb;
+    tResultado* res = NULL;
 
     printf("Ingrese la carrera que quiere dar de baja: ");
     scanf("%d",&auxId);
 
     aux=busquedaCarrera(pf,tam,auxId);
-    if(aux!=-1)
-    {
-        fseek(pf,-(tam+sizeof(tResultado)*aux.cant_resultados),SEEK_CUR);
+
+    if(aux.id!=-1){
+        res = malloc(sizeof(tResultado)*aux.cant_resultados);
+        if(!res)
+            return ERR_MEM;
+        fread(res, sizeof(tResultado), aux.cant_resultados, pf);
+        fseek(pf, -(long)(tam+(sizeof(tResultado)*aux.cant_resultados)), SEEK_CUR);
         aux.estado=0;
         fwrite(&aux,tam,1,pf);
 
-        fwrite(&aux,tam,1,pb);
+        pb = fopen(arc, "ab");
+        if(!pb){
+            free(res);
+            return ERR_AP;
+        }
+        fwrite(&aux, tam, 1, pb);
+        fwrite(res, sizeof(tResultado), aux.cant_resultados, pb);
         fclose(pb);
+        free(res);
+        printf("\nCarrera dada de baja exitosamente!");
     }
+    else
+        printf("\nCarrera no encontrada.");
     return TODO_OK;
 }
 
-tCarrera busquedaCarrera(FILE* pf, size_t tam, int clave)
-{
+tCarrera busquedaCarrera(FILE* pf, size_t tam, int clave){
     tCarrera aux;
-    tResultado auxResu;
     int enco=0;
     rewind(pf);
-
     fread(&aux,tam,1,pf);
-    fread(&auxResu,sizeof(tResultado),aux.cant_resultados,pf);
-
-    while(!feof(pf) && !enco)
-    {
+    while(!feof(pf) && !enco){
         if(aux.id==clave)
             enco=1;
-        else
-        {
+        else{
+            fseek(pf, sizeof(tResultado)*aux.cant_resultados, SEEK_CUR);//salteamos toda la matriz de resultados.
             fread(&aux,tam,1,pf);
-            fread(&auxResu,sizeof(tResultado),aux.cant_resultados,pf);
         }
     }
     if(!enco)
         aux.id=-1;
-
     return aux;
 }
 
@@ -477,6 +481,74 @@ void modifiPiloto(FILE* pf, const char* arc, size_t tam){
         printf("\nNo se encontro un piloto con esa ID.\n");
 }
 
+int modifiCarrera(FILE* pf, const char* arc, size_t tam){
+    tCarrera aux;
+    tResultado* res = NULL;
+    int auxId;
+    char op;
+    rewind(pf);
+
+    printf("\tIngrese la id de la carrera que quiere modificar: ");
+    scanf("%d", &auxId);
+    aux = busquedaCarrera(pf, tam, auxId);
+    if(aux.id!=-1){
+        res = malloc(sizeof(tResultado)*aux.cant_resultados); //consideramos que el usuario no puede cambiar la cantidad de corredores.
+        if(!res)
+            return ERR_MEM;
+        fread(res, sizeof(tResultado), aux.cant_resultados, pf);
+        op = menuBase(MENU_MODICARRERA, OPCIONES_MENUMODICARRERA);
+        switch(op){
+            case '1':
+                printf("\nIngrese el nombre del nuevo circuito: ");
+                fgets(aux.circuito, sizeof(aux.circuito), stdin);
+                aux.circuito[strcspn(aux.circuito, "\n")] = 0;
+                break;
+            case '2':
+                printf("\nIngrese la nueva fecha en formato Unix Time Stamp: ");
+                scanf("%llu", &aux.fecha);
+                break;
+            case '3':
+                aux.estado = (aux.estado == 1) ? 0 : 1;
+                printf("\n\tEstado cambiado a %d con exito!\n", aux.estado);
+                break;
+            case '4':
+                modifiMatrizResultados(&aux, res);
+                break;
+            case '5':
+                free(res);
+                break;
+        }
+        fseek(pf, -(long)(tam+sizeof(tResultado)* aux.cant_resultados), SEEK_CUR);
+        fwrite(&aux, tam, 1, pf);
+        fwrite(res, sizeof(tResultado), aux.cant_resultados, pf);
+        free(res);
+        printf("\nCarrera modificada con exito!");
+    }
+    else
+        printf("\nCarrera no encontrada.");
+    return TODO_OK;
+}
+
+void modifiMatrizResultados(tCarrera* car, tResultado* vec){
+    size_t i;
+    system("cls");
+    for(i=0; i<car->cant_resultados; i++){ //consideramos que el id de los pilotos que participaron no se puede cambiar solo su posicion y puntos
+        do{
+            printf("\nIngrese la posicion del piloto %d", (vec+i)->id_piloto);
+            scanf("%d", &(vec+i)->posicion);
+            while(getchar()!='\n');
+            if((vec+i)->posicion<1 || (vec+i)->posicion>20)
+                printf("\nPosicion invalida. Intente nuevamente!");
+        }while((vec+i)->posicion<1 || (vec+i)->posicion>20);
+        do{
+            printf("\nIngrese los puntos del piloto %d", (vec+i)->id_piloto);
+            scanf("%d", &(vec+i)->total_puntos);
+            while(getchar()!='\n');
+            if((vec+i)->total_puntos<1 || (vec+i)->total_puntos>25)
+                printf("\nPuntos invalidos. Intente nuevamente!");
+        }while((vec+i)->total_puntos<1 || (vec+i)->total_puntos>25);
+    }
+}
 
 void ingresarRegEscuderia(FILE* pf, size_t tam){
     unsigned int auxId = 1;
@@ -502,8 +574,10 @@ void ingresarRegEscuderia(FILE* pf, size_t tam){
 
 
     printf("\n\tIngrese el pais de  la escuderia: ");
-    fflush(stdin);
-    gets(aux.pais);
+    while(getchar() != '\n');
+    fgets(aux.pais, sizeof(aux.pais), stdin);
+    aux.pais[strcspn(aux.pais, "\n")] = 0;
+
     printf("\n\tIngrese el pais de la escuderia: ");
     fgets(aux.pais, sizeof(aux.pais), stdin);
     aux.pais[strcspn(aux.pais, "\n")] = 0;
