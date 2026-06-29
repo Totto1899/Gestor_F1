@@ -102,7 +102,6 @@ int main(){
                     printf("\nNo se pudo reservar memoria!");
                 break;
             case '8':
-                {
                 char temp1[20] = ARCH_CARRERA;
                 char temp2[20] = ARCH_CARRERA2;
                 char resultado[20] = "combinado.dat";
@@ -121,7 +120,6 @@ int main(){
         if(op!='0'){
             printf("\n");
             system("pause");
-        }
         }
     }while(op!='0');
     return 0;

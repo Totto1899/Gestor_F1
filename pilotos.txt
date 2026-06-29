@@ -1,12 +1,12 @@
-101|Max Verstappen|Neerlandesa|1|395|A|875577600
-102|Sergio Perez|Mexicana|1|258|A|633312000
-103|Charles Leclerc|Monegasca|2|280|A|876960000
-104|Carlos Sainz|Espanola|2|200|A|778377600
-105|Lewis Hamilton|Britanica|3|220|A|473904000
-106|George Russell|Britanica|3|160|A|887500800
-107|Lando Norris|Britanica|4|195|A|942451200
-108|Oscar Piastri|Australiana|4|150|A|986515200
-109|Fernando Alonso|Espanola|5|180|A|365212800
-110|Lance Stroll|Canadiense|5|60|A|909619200
-111|Kimi Raikkonen|Finlandesa|2|0|R|308966400
-112|Kevin Magnussen|Danesa|6|15|S|718243200
+ID: 101  | Piloto: Max Verstappen       | Estado: A | Puntos: 395
+ID: 102  | Piloto: Sergio Perez         | Estado: A | Puntos: 258
+ID: 103  | Piloto: Charles Leclerc      | Estado: A | Puntos: 280
+ID: 104  | Piloto: Carlos Sainz         | Estado: A | Puntos: 200
+ID: 105  | Piloto: Lewis Hamilton       | Estado: A | Puntos: 220
+ID: 106  | Piloto: George Russell       | Estado: A | Puntos: 160
+ID: 107  | Piloto: Lando Norris         | Estado: A | Puntos: 195
+ID: 108  | Piloto: Oscar Piastri        | Estado: A | Puntos: 150
+ID: 109  | Piloto: Fernando Alonso      | Estado: A | Puntos: 180
+ID: 110  | Piloto: Lance Stroll         | Estado: A | Puntos: 60
+ID: 111  | Piloto: Kimi Raikkonen       | Estado: R | Puntos: 0
+ID: 112  | Piloto: Kevin Magnussen      | Estado: S | Puntos: 15
