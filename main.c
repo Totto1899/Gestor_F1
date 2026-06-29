@@ -11,7 +11,6 @@ int cmpPilotosPorPuntos(const void*, const void*);
 void mostrarPiloto(const void* v); ///tambien usada para item 5
 
 int main(){
-/*
     generarLoteEscuderiasTXT(CARGA_ESCUD);
     generarLotePilotosTXT(CARGA_PILOTO);
 
@@ -42,7 +41,7 @@ int main(){
     volcarABinario(ARCH_ESCUD, vectorEscuderias, sizeof(tEscuderia), ce_escu);
     free(vectorEscuderias);
     printf("\n");
-
+    /*
     printf("[*] Creando carrera...\n");
     generarLoteArchivoCarrera(ARCH_CARRERA, ARCH_PILOTO);
 
@@ -54,8 +53,7 @@ int main(){
         printf("[OK] El archivo de carreras fue destruido y vaciado a 0 bytes.\n");
         system("pause");
     }
-
-*/
+    */
     srand(time(NULL));
     int flag, random;
 
